@@ -1,0 +1,23 @@
+#!/bin/bash
+
+JOURNAL_DIR="$HOME/journalot"
+TODAY=$(date '+%Y-%m-%d')
+FILENAME="$JOURNAL_DIR/$TODAY.md"
+
+mkdir -p "$JOURNAL_DIR"
+cd "$JOURNAL_DIR" || exit 1
+
+git pull origin main --rebase
+
+if [ ! -f "$FILENAME" ]; then
+  echo "# $TODAY" > "$FILENAME"
+fi
+
+code "$FILENAME"
+
+echo "Press Enter when you've finished editing to commit and push..."
+read -r
+
+git add "$FILENAME"
+git commit -m "Journal entry for $TODAY"
+git push origin main
