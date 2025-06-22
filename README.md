@@ -2,9 +2,16 @@
 
 **Minimal journaling CLI for developers. Just type `journal` in your terminal and start writing.**
 
-This provides a simple way to maintain a daily journal using text/markdown files, with automatic version control via Git. It is designed to be lightweight and easy to use, promoting mindfulness and reflection. 
+`journalot` is a CLI tool for maintaining a daily markdown journal with Git-based version control. It's designed to be lightweight and easy to use, promoting mindfulness and reflection. 
 
-You're then also able to view your journal entries from the past and grep for keywords or phrases or even search for specific dates.
+You can also search past entries by keyword or date using command-line tools like grep or fzf. For example, grep "confidence" or "new idea" ~/journalot/*.md
+
+## ✅ Features
+-   Creates a daily journal file: `YYYY-MM-DD.md`
+-   Opens it in VS Code
+-   Auto-commits and pushes to your private or public GitHub repo
+-   Works across multiple devices
+-   Promotes mindfulness through lightweight journaling
 
 ## 🛠️ Installation
 
@@ -14,15 +21,18 @@ cd journalot
 sudo ./install.sh
 ```
 
-## ✅ Features
--   Creates a daily journal file: `YYYY-MM-DD.md`
--   Opens it in VS Code
--   Auto-commits and pushes to your private or public GitHub repo
--   Works across multiple devices
--   Promotes mindfulness through lightweight journaling
- 
 ## 🔐 SSH Setup
 Make sure you have SSH access set up for GitHub. [Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+
+## 🔄 Set Up Your Own Private Journal Repo
+By default, this repo points to my public GitHub. To push your own journal entries:
+1. Create a new private repo on GitHub (e.g., `journalot-private`)
+2. Replace the remote:
+```bash
+   git remote remove origin
+   git remote add origin git@github.com:<your-username>/journalot-private.git
+   git push -u origin main
+ ```
 
 ## 📦 Use
 `journal` 
