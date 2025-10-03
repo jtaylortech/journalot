@@ -32,6 +32,19 @@ You can also search past entries by keyword or date using command-line tools lik
 -   **Timestamps**: `--time` creates multiple entries per day (e.g., `2025-01-15-1430.md`)
 -   **Tags**: Filter entries by hashtag with `--tag work`
 -   **Export**: `--export html` or `--export pdf` to share or archive
+-   **Random entry**: `--random` rediscover old thoughts
+-   **Diff view**: `--diff DATE` see what changed in an entry
+-   **Archive**: `--archive YEAR` move old years to archive folder
+-   **Daily prompts**: Writing prompts for blank entries (disable with `DISABLE_PROMPTS=true`)
+
+### Pro Features (Premium)
+-   **AI Insights**: `--insights` weekly patterns and AI-powered analysis
+-   **Voice capture**: `--voice` record and transcribe voice memos
+-   **Encryption**: `--encrypt` GPG encryption for sensitive entries
+-   **Cloud backup**: `--backup` auto-backup to S3/Dropbox beyond Git
+-   **Graph view**: `--graph` visualize tag connections and patterns
+
+[Get Pro →](https://journalot.dev/pro) | [Sponsor on GitHub →](https://github.com/sponsors/jtaylortech)
 
 ## Why journalot?
 
@@ -85,6 +98,15 @@ journal --search "confidence"        # Search all entries for keyword
 journal --week                       # Open all entries from this week
 journal --tag work                   # Filter entries by #tag
 journal --stats                      # View journal statistics
+journal --random                     # Show a random entry
+journal --diff 2025-01-15            # See git history for an entry
+journal --prompt                     # Show today's writing prompt
+```
+
+### Archive & Organization
+```bash
+journal --archive 2024               # Archive all 2024 entries
+journal --archive 2024 --unarchive   # Restore from archive
 ```
 
 ### Export & Sharing
@@ -128,6 +150,37 @@ Create `~/journalot/template.md` to customize new entries:
 - Week view opens all entries in your editor at once
 - Stats are informational only - no guilt for skipping days
 - Templates support `{{date}}` placeholder
+- Daily prompts rotate based on day of year (disable with `DISABLE_PROMPTS=true`)
+- Archive old entries to keep your main folder clean
+- Use `--random` for serendipitous rediscovery
+
+---
+
+## journalot Pro
+
+Upgrade to **journalot Pro** for advanced features:
+
+### What's Included
+- 🤖 **AI Insights**: Weekly patterns, mood tracking, and personalized insights
+- 🎙️ **Voice Capture**: Record and transcribe voice memos directly into your journal
+- 🔐 **Encryption**: GPG encryption for sensitive entries
+- ☁️ **Cloud Backup**: Automatic backup to S3/Dropbox beyond Git
+- 📊 **Graph View**: Visualize tag connections and topic relationships
+
+### Pricing
+- **$20/year** or **$50 lifetime**
+- **Free for GitHub Sponsors** ($50+/month tier)
+
+### How to Get Pro
+1. Purchase a license at [journalot.dev/pro](https://journalot.dev/pro)
+2. Add your license key to `~/.journalotrc`:
+   ```bash
+   PRO_LICENSE=your-license-key-here
+   ```
+3. Start using Pro features: `journal --insights`, `journal --voice`, etc.
+
+### Support Open Source
+Prefer to support through sponsorship? [Sponsor on GitHub](https://github.com/sponsors/jtaylortech) and get Pro features free at the $50+/month tier.
 
 ---
 
