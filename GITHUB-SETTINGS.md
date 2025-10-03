@@ -3,7 +3,7 @@
 ## Update These Manually on GitHub
 
 ### 1. Repository Description
-Go to: `https://github.com/jtaylortech/journalot` → Click the gear icon ⚙️ next to "About"
+Go to: `https://github.com/jtaylortech/journalot` → Click the gear icon next to "About"
 
 **Set to:**
 ```

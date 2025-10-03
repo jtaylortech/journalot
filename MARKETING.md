@@ -158,17 +158,17 @@ https://github.com/jtaylortech/journalot
 journalot is the minimalist journaling tool for developers. No accounts, no UI, no distractions—just type `journal` and write.
 
 **What makes it different:**
-✅ Lives in your terminal (you're already there)
-✅ Uses your preferred editor ($EDITOR/VS Code/vim/nano)
-✅ Git-based sync (works across devices)
-✅ Only commits when you actually change something
-✅ 100% open source, 200 lines of bash
+- Lives in your terminal (you're already there)
+- Uses your preferred editor ($EDITOR/VS Code/vim/nano)
+- Git-based sync (works across devices)
+- Only commits when you actually change something
+- 100% open source, 200 lines of bash
 
 **Who is it for:**
 Developers who tried journaling apps but never stuck with them. If you spend your day in a terminal, this will fit your workflow perfectly.
 
 **First Comment (as maker):**
-Hey PH! 👋
+Hey PH,
 
 I built journalot because I kept failing at journaling. Every app had too much friction: open app, wait for sync, click "new entry", pick template...
 
@@ -193,7 +193,7 @@ Would love to hear what you think!
 
 ### Thread (Main Launch)
 ```
-🧵 I tried every journaling app. None stuck.
+I tried every journaling app. None stuck.
 
 Then I realized: I don't need another app. I need less friction.
 
@@ -234,11 +234,11 @@ That's it. No login, no loading, no decisions.
 
 Why it works for devs:
 
-✅ You're already in terminal
-✅ Uses your $EDITOR (no learning curve)
-✅ Git-backed (sync like code)
-✅ Searchable (grep is your friend)
-✅ Private (it's just .md files)
+- You're already in terminal
+- Uses your $EDITOR (no learning curve)
+- Git-backed (sync like code)
+- Searchable (grep is your friend)
+- Private (it's just .md files)
 
 [4/6]
 
@@ -260,7 +260,7 @@ Journaling shouldn't require willpower.
 
 It should require typing 7 characters.
 
-⭐️ Star if interested: github.com/jtaylortech/journalot
+Star if interested: github.com/jtaylortech/journalot
 
 [6/6]
 ```
@@ -285,13 +285,13 @@ github.com/jtaylortech/journalot
 ```
 Why journalot works for devs:
 
-❌ No context switching
-❌ No new tools to learn
-❌ No "sync services"
+No context switching
+No new tools to learn
+No "sync services"
 
-✅ Terminal-native
-✅ Uses your $EDITOR
-✅ Git-backed
+Terminal-native
+Uses your $EDITOR
+Git-backed
 
 It's just bash + markdown.
 
@@ -336,31 +336,17 @@ Minimal journaling CLI for developers. Git-backed, terminal-native, zero frictio
 - daily-journal
 
 **About section:**
-`🧘 Minimal journaling CLI for developers | Git-backed | Terminal-native | Zero friction`
+`Minimal journaling CLI for developers | Git-backed | Terminal-native | Zero friction`
 
-### Add to README (top section)
+### Already Updated in README
 
-Add badges:
+Badges added:
 ```markdown
-![GitHub stars](https://img.shields.io/github/stars/jtaylortech/journalot?style=social)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Bash](https://img.shields.io/badge/bash-4.0+-green.svg)
 ```
 
-Add "Why journalot?" section after features:
-```markdown
-## 🤔 Why journalot?
-
-Every journaling app has the same problem: friction. Open app → wait for sync → click new entry → choose template...
-
-journalot eliminates all of that:
-- You're already in terminal → just type `journal`
-- Opens in your preferred editor → no learning curve
-- Auto-commits to git → no manual syncing
-- Just markdown files → complete ownership
-
-The best productivity tool is the one you actually use.
-```
+"Why journalot?" section added after features.
 
 ---
 
