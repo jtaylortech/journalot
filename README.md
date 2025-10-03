@@ -1,3 +1,4 @@
+
 # journalot
 
 **Minimal journaling CLI for developers. Just type `journal` in your terminal and start writing.**
@@ -8,9 +9,13 @@ You can also search past entries by keyword or date using command-line tools lik
 
 ## ✅ Features
 -   Creates a daily journal file: `YYYY-MM-DD.md`
--   Opens it in VS Code
--   Auto-commits and pushes to your private or public GitHub repo
+-   Smart editor detection (respects `$EDITOR` or falls back to code → vim → nano)
+-   Optional Git integration with auto-commit and push
+-   Access previous entries with `--yesterday` or `--date`
+-   List all entries with `--list`
+-   Only commits when changes are detected
 -   Works across multiple devices
+-   Dependency checking and helpful error messages
 -   Promotes mindfulness through lightweight journaling
 
 ## 🛠️ Installation
@@ -21,8 +26,8 @@ cd journalot
 sudo ./install.sh
 ```
 
-## 🔐 SSH Setup
-Make sure you have SSH access set up for GitHub. [Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+## 🔐 SSH Setup (Optional)
+If you want to sync across devices, set up SSH access for GitHub. [Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
 
 ## 🔄 Set Up Your Own Private Journal Repo
 By default, this repo points to my public GitHub. To push your own journal entries:
@@ -34,13 +39,28 @@ By default, this repo points to my public GitHub. To push your own journal entri
    git push -u origin main
  ```
 
-## 📦 Use
-`journal` 
+## 📦 Usage
 
----
+### Basic Usage
+```bash
+journal                    # Open today's journal
+journal --yesterday        # Open yesterday's journal
+journal --date 2025-01-15  # Open specific date
+journal --list             # List all entries
+journal --help             # Show help
+```
 
-### ✏️ Customizations
-You can modify the journal directory or change editors (e.g. `nano`, `vim`) by editing the `bin/journal` script.
+### First Run
+On first run, journalot will offer to initialize a git repository if one doesn't exist. You can choose to skip this if you don't want version control.
+
+### Customization
+- **Editor**: Set `$EDITOR` environment variable (e.g., `export EDITOR=vim`)
+- **Journal Directory**: Edit `JOURNAL_DIR` in `bin/journal` (default: `~/journalot`)
+
+### Tips
+- Use `grep "keyword" ~/journalot/*.md` to search all entries
+- Use `fzf` for interactive entry selection
+- Set up a private GitHub repo to sync across devices
 
 ---
 
