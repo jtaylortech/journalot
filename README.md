@@ -1,6 +1,9 @@
 
 # journalot
 
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Bash](https://img.shields.io/badge/bash-4.0+-green.svg)
+
 **Minimal journaling CLI for developers. Just type `journal` in your terminal and start writing.**
 
 `journalot` is a CLI tool for maintaining a daily markdown journal with Git-based version control. It's designed to be lightweight and easy to use, promoting mindfulness and reflection. 
@@ -17,6 +20,18 @@ You can also search past entries by keyword or date using command-line tools lik
 -   Works across multiple devices
 -   Dependency checking and helpful error messages
 -   Promotes mindfulness through lightweight journaling
+
+## 🤔 Why journalot?
+
+Every journaling app has the same problem: **friction**. Open app → wait for sync → click new entry → choose template...
+
+journalot eliminates all of that:
+- **You're already in terminal** → just type `journal`
+- **Opens in your preferred editor** → no learning curve
+- **Auto-commits to git** → no manual syncing
+- **Just markdown files** → complete ownership
+
+The best productivity tool is the one you actually use.
 
 ## 🛠️ Installation
 
