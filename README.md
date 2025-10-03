@@ -11,15 +11,27 @@
 You can also search past entries by keyword or date using command-line tools like grep or fzf. For example, grep "confidence" or "new idea" ~/journalot/entries/*.md
 
 ## Features
--   Creates a daily journal file: `YYYY-MM-DD.md`
+
+### Core Features
+-   Creates a daily journal file: `YYYY-MM-DD.md` stored in `entries/` folder
 -   Smart editor detection (respects `$EDITOR` or falls back to code → vim → nano)
 -   Optional Git integration with auto-commit and push
--   Access previous entries with `--yesterday` or `--date`
--   List all entries with `--list`
--   Only commits when changes are detected
--   Works across multiple devices
--   Dependency checking and helpful error messages
--   Promotes mindfulness through lightweight journaling
+-   Template support for customized entry structure
+-   Config file support (`~/.journalotrc`)
+
+### Quick Wins
+-   **Quick capture**: `journal "Had a great idea"` - append to today's entry without opening editor
+-   **Enhanced list view**: Word count and preview for each entry
+-   **Auto-sync**: Set `AUTOSYNC=true` in config to skip commit/push prompts
+-   **Previous entries**: `--yesterday` or `--date` to access any day
+
+### Power Features
+-   **Stats**: `--stats` shows total entries, words, and patterns (non-gamified)
+-   **Search**: `--search "keyword"` to find entries containing text
+-   **Week view**: `--week` opens all entries from current week
+-   **Timestamps**: `--time` creates multiple entries per day (e.g., `2025-01-15-1430.md`)
+-   **Tags**: Filter entries by hashtag with `--tag work`
+-   **Export**: `--export html` or `--export pdf` to share or archive
 
 ## Why journalot?
 
@@ -58,24 +70,64 @@ By default, this repo points to my public GitHub. To push your own journal entri
 
 ### Basic Usage
 ```bash
-journal                    # Open today's journal
-journal --yesterday        # Open yesterday's journal
-journal --date 2025-01-15  # Open specific date
-journal --list             # List all entries
-journal --help             # Show help
+journal                              # Open today's journal
+journal "Had a breakthrough today"   # Quick capture (append without editor)
+journal --yesterday                  # Open yesterday's journal
+journal --date 2025-01-15            # Open specific date
+journal --time                       # Create timestamped entry (multiple per day)
+journal --list                       # List all entries with previews
+journal --help                       # Show help
 ```
 
-### First Run
-On first run, journalot will offer to initialize a git repository if one doesn't exist. You can choose to skip this if you don't want version control.
+### Search & Discovery
+```bash
+journal --search "confidence"        # Search all entries for keyword
+journal --week                       # Open all entries from this week
+journal --tag work                   # Filter entries by #tag
+journal --stats                      # View journal statistics
+```
+
+### Export & Sharing
+```bash
+journal --export html                # Export to HTML
+journal --export pdf                 # Export to PDF (requires pandoc)
+```
+
+### Configuration
+
+Create `~/.journalotrc` to customize behavior:
+```bash
+# Auto-sync without prompts
+AUTOSYNC=true
+
+# Custom journal directory (optional)
+# JOURNAL_DIR="$HOME/my-journal"
+```
+
+Create `~/journalot/template.md` to customize new entries:
+```markdown
+# {{date}}
+
+## What happened today?
+
+## Grateful for
+
+## Tomorrow's focus
+```
 
 ### Customization
 - **Editor**: Set `$EDITOR` environment variable (e.g., `export EDITOR=vim`)
-- **Journal Directory**: Edit `JOURNAL_DIR` in `bin/journal` (default: `~/journalot`)
+- **Journal Directory**: Edit `JOURNAL_DIR` in config or `bin/journal` (default: `~/journalot`)
+- **Template**: Create `~/journalot/template.md` for custom entry structure
+- **Auto-sync**: Set `AUTOSYNC=true` in `~/.journalotrc` to skip prompts
 
 ### Tips
-- Use `grep "keyword" ~/journalot/entries/*.md` to search all entries
-- Use `fzf` for interactive entry selection
-- Set up a private GitHub repo to sync across devices
+- Quick capture great for fleeting thoughts: `journal "Remember to check that bug"`
+- Use tags for organization: add `#work`, `#personal`, `#ideas` to entries
+- Search is case-insensitive and shows line numbers
+- Week view opens all entries in your editor at once
+- Stats are informational only - no guilt for skipping days
+- Templates support `{{date}}` placeholder
 
 ---
 
