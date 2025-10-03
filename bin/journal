@@ -38,6 +38,34 @@ check_dependencies() {
     fi
 }
 
+# Check if user has Pro license
+check_pro_license() {
+    if [ -n "$PRO_LICENSE" ]; then
+        # Basic validation (honor system for now)
+        if [ "${#PRO_LICENSE}" -ge 16 ]; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
+# Show pro feature message
+show_pro_message() {
+    local feature="$1"
+    echo -e "${YELLOW}$feature is a Pro feature${NC}"
+    echo ""
+    echo "Upgrade to journalot Pro for:"
+    echo "  • AI insights and summaries"
+    echo "  • Voice capture"
+    echo "  • Advanced encryption"
+    echo "  • Cloud backup"
+    echo "  • Graph visualization"
+    echo ""
+    echo "Learn more: https://journalot.dev/pro"
+    echo "GitHub Sponsors ($50+/month): https://github.com/sponsors/jtaylortech"
+    echo ""
+}
+
 # Determine editor
 get_editor() {
     if [ -n "$EDITOR" ]; then
@@ -94,6 +122,17 @@ OPTIONS:
     --tag TAG               Filter entries by tag
     --stats                 Show journal statistics
     --export FORMAT         Export entries (html/pdf)
+    --random                Show a random entry
+    --diff DATE             Show git diff for an entry
+    --archive YEAR          Archive entries from a year
+    --prompt                Show today's writing prompt
+
+PRO FEATURES (requires license):
+    --insights              AI-powered insights and patterns
+    --voice                 Voice capture with transcription
+    --encrypt               Encrypt sensitive entries with GPG
+    --backup                Cloud backup to S3/Dropbox
+    --graph                 Visualize tag connections
 
 EXAMPLES:
     journal                           # Open today's journal
@@ -302,6 +341,195 @@ quick_capture() {
     success_msg "Added to $ENTRY_DATE.md"
 }
 
+# Random entry
+show_random() {
+    if [ ! -d "$JOURNAL_DIR/entries" ]; then
+        error_exit "No entries directory found"
+    fi
+
+    local files=($(find "$JOURNAL_DIR/entries" -name "*.md" -type f))
+
+    if [ ${#files[@]} -eq 0 ]; then
+        error_exit "No journal entries found"
+    fi
+
+    local random_index=$((RANDOM % ${#files[@]}))
+    local random_file="${files[$random_index]}"
+    local filename=$(basename "$random_file" .md)
+
+    echo -e "${BLUE}Random entry: ${GREEN}$filename${NC}\n"
+    cat "$random_file"
+}
+
+# Show diff for entry
+show_diff() {
+    local target_date="$1"
+    if [ -z "$target_date" ]; then
+        error_exit "Date required for --diff"
+    fi
+
+    local filename="$JOURNAL_DIR/entries/$target_date.md"
+
+    if [ ! -f "$filename" ]; then
+        error_exit "No entry found for $target_date"
+    fi
+
+    cd "$JOURNAL_DIR" || error_exit "Cannot access journal directory"
+
+    echo -e "${BLUE}Changes to $target_date.md:${NC}\n"
+    git log -p --color -- "entries/$target_date.md" | head -100
+}
+
+# Archive entries
+archive_entries() {
+    local year="$1"
+    local unarchive="$2"
+
+    if [ -z "$year" ]; then
+        error_exit "Year required for --archive (e.g., --archive 2024)"
+    fi
+
+    if [ "$unarchive" = "--unarchive" ]; then
+        # Restore from archive
+        if [ ! -d "$JOURNAL_DIR/archive/$year" ]; then
+            error_exit "No archive found for $year"
+        fi
+
+        echo -e "${BLUE}Restoring $year entries from archive...${NC}"
+        mv "$JOURNAL_DIR/archive/$year"/*.md "$JOURNAL_DIR/entries/" 2>/dev/null
+        rmdir "$JOURNAL_DIR/archive/$year" 2>/dev/null
+
+        success_msg "Restored $year entries"
+    else
+        # Archive
+        mkdir -p "$JOURNAL_DIR/archive/$year"
+
+        local count=$(find "$JOURNAL_DIR/entries" -name "$year-*.md" -type f 2>/dev/null | wc -l | tr -d ' ')
+
+        if [ "$count" -eq 0 ]; then
+            error_exit "No entries found for $year"
+        fi
+
+        echo -e "${BLUE}Archiving $count entries from $year...${NC}"
+        mv "$JOURNAL_DIR/entries/$year-"*.md "$JOURNAL_DIR/archive/$year/" 2>/dev/null
+
+        success_msg "Archived $count entries to archive/$year/"
+    fi
+}
+
+# Get daily prompt
+get_daily_prompt() {
+    local prompts=(
+        "What made you smile today?"
+        "What challenged you today?"
+        "What are you grateful for right now?"
+        "What did you learn today?"
+        "What would you do differently?"
+        "What progress did you make?"
+        "What's on your mind?"
+        "Who inspired you today?"
+        "What surprised you?"
+        "What are you looking forward to?"
+        "What did you accomplish today?"
+        "What's something you're proud of?"
+        "What helped you grow today?"
+        "What made today unique?"
+        "What connections did you make?"
+        "What decision are you facing?"
+        "What pattern did you notice?"
+        "What do you need to let go of?"
+        "What energized you today?"
+        "What drained your energy?"
+    )
+
+    # Use date as seed for consistent daily prompt
+    local day_of_year=$(date '+%j')
+    local index=$((day_of_year % ${#prompts[@]}))
+
+    echo "${prompts[$index]}"
+}
+
+# Pro Feature: AI Insights
+ai_insights() {
+    if ! check_pro_license; then
+        show_pro_message "AI Insights"
+        return 1
+    fi
+
+    echo -e "${BLUE}Analyzing your journal entries...${NC}\n"
+    echo "🚧 AI Insights feature coming soon!"
+    echo ""
+    echo "This will provide:"
+    echo "  • Weekly patterns and themes"
+    echo "  • Mood tracking over time"
+    echo "  • Writing habit analysis"
+    echo "  • Personalized insights"
+}
+
+# Pro Feature: Voice Capture
+voice_capture() {
+    if ! check_pro_license; then
+        show_pro_message "Voice Capture"
+        return 1
+    fi
+
+    echo -e "${BLUE}Voice Capture${NC}\n"
+    echo "🚧 Voice capture feature coming soon!"
+    echo ""
+    echo "This will provide:"
+    echo "  • Record voice memos"
+    echo "  • Automatic transcription"
+    echo "  • Append to today's entry"
+}
+
+# Pro Feature: Encrypt Entry
+encrypt_entry() {
+    if ! check_pro_license; then
+        show_pro_message "Encryption"
+        return 1
+    fi
+
+    echo -e "${BLUE}Encryption${NC}\n"
+    echo "🚧 Encryption feature coming soon!"
+    echo ""
+    echo "This will provide:"
+    echo "  • GPG encryption for sensitive entries"
+    echo "  • Password protection"
+    echo "  • Transparent decryption for viewing"
+}
+
+# Pro Feature: Cloud Backup
+cloud_backup() {
+    if ! check_pro_license; then
+        show_pro_message "Cloud Backup"
+        return 1
+    fi
+
+    echo -e "${BLUE}Cloud Backup${NC}\n"
+    echo "🚧 Cloud backup feature coming soon!"
+    echo ""
+    echo "This will provide:"
+    echo "  • Automatic backup to S3/Dropbox"
+    echo "  • Version history"
+    echo "  • Restore from backup"
+}
+
+# Pro Feature: Graph View
+graph_view() {
+    if ! check_pro_license; then
+        show_pro_message "Graph View"
+        return 1
+    fi
+
+    echo -e "${BLUE}Graph View${NC}\n"
+    echo "🚧 Graph view feature coming soon!"
+    echo ""
+    echo "This will provide:"
+    echo "  • Visualize tag connections"
+    echo "  • Topic relationships"
+    echo "  • Interactive HTML graph"
+}
+
 # Parse arguments
 ENTRY_DATE=$(date '+%Y-%m-%d')
 USE_TIMESTAMP=false
@@ -367,6 +595,48 @@ while [[ $# -gt 0 ]]; do
             fi
             exit 0
             ;;
+        --random)
+            show_random
+            exit 0
+            ;;
+        --diff)
+            if [ -z "$2" ]; then
+                error_exit "Date required for --diff"
+            fi
+            show_diff "$2"
+            exit 0
+            ;;
+        --archive)
+            if [ -z "$2" ]; then
+                error_exit "Year required for --archive"
+            fi
+            archive_entries "$2" "$3"
+            exit 0
+            ;;
+        --prompt)
+            get_daily_prompt
+            exit 0
+            ;;
+        --insights)
+            ai_insights
+            exit 0
+            ;;
+        --voice)
+            voice_capture
+            exit 0
+            ;;
+        --encrypt)
+            encrypt_entry
+            exit 0
+            ;;
+        --backup)
+            cloud_backup
+            exit 0
+            ;;
+        --graph)
+            graph_view
+            exit 0
+            ;;
         -*)
             error_exit "Unknown option: $1\nUse --help for usage information"
             ;;
@@ -422,6 +692,13 @@ if [ ! -f "$FILENAME" ]; then
     else
         echo "# $ENTRY_DATE" > "$FILENAME"
         echo "" >> "$FILENAME"
+
+        # Add daily prompt if not disabled
+        if [ "$DISABLE_PROMPTS" != "true" ]; then
+            local prompt=$(get_daily_prompt)
+            echo "**Prompt**: $prompt" >> "$FILENAME"
+            echo "" >> "$FILENAME"
+        fi
     fi
 
     if [ "$USE_TIMESTAMP" = true ]; then

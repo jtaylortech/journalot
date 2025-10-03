@@ -10,3 +10,9 @@ entries/
 # Editor files
 .vscode/
 .idea/
+
+# Development status (local only)
+STATUS.md
+NOTES.md
+MONETIZATION.md
+SPONSORS.md
