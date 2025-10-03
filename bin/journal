@@ -96,12 +96,12 @@ EOF
 
 # List all entries
 list_entries() {
-    if [ ! -d "$JOURNAL_DIR" ]; then
-        error_exit "No journal directory found at $JOURNAL_DIR"
+    if [ ! -d "$JOURNAL_DIR/entries" ]; then
+        error_exit "No entries directory found at $JOURNAL_DIR/entries"
     fi
 
     echo "Journal entries:"
-    find "$JOURNAL_DIR" -name "*.md" -type f | sort -r | while read -r file; do
+    find "$JOURNAL_DIR/entries" -name "*.md" -type f | sort -r | while read -r file; do
         basename "$file"
     done
 }
@@ -139,10 +139,10 @@ done
 # Main logic
 check_dependencies
 
-FILENAME="$JOURNAL_DIR/$ENTRY_DATE.md"
+FILENAME="$JOURNAL_DIR/entries/$ENTRY_DATE.md"
 EDITOR_CMD=$(get_editor)
 
-mkdir -p "$JOURNAL_DIR"
+mkdir -p "$JOURNAL_DIR/entries"
 cd "$JOURNAL_DIR" || error_exit "Cannot access journal directory: $JOURNAL_DIR"
 
 # Initialize or check git repo
