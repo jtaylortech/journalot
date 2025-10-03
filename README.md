@@ -8,7 +8,7 @@
 
 `journalot` is a CLI tool for maintaining a daily markdown journal with Git-based version control. It's designed to be lightweight and easy to use, promoting mindfulness and reflection. 
 
-You can also search past entries by keyword or date using command-line tools like grep or fzf. For example, grep "confidence" or "new idea" ~/journalot/*.md
+You can also search past entries by keyword or date using command-line tools like grep or fzf. For example, grep "confidence" or "new idea" ~/journalot/entries/*.md
 
 ## Features
 -   Creates a daily journal file: `YYYY-MM-DD.md`
@@ -73,7 +73,7 @@ On first run, journalot will offer to initialize a git repository if one doesn't
 - **Journal Directory**: Edit `JOURNAL_DIR` in `bin/journal` (default: `~/journalot`)
 
 ### Tips
-- Use `grep "keyword" ~/journalot/*.md` to search all entries
+- Use `grep "keyword" ~/journalot/entries/*.md` to search all entries
 - Use `fzf` for interactive entry selection
 - Set up a private GitHub repo to sync across devices
 

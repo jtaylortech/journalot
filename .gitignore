@@ -1,0 +1,12 @@
+# User journal entries (keep this private in your fork)
+entries/
+
+# System files
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Editor files
+.vscode/
+.idea/
