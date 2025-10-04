@@ -1,0 +1,261 @@
+:root {
+  --bg: #0d1117;
+  --text: #c9d1d9;
+  --accent: #58a6ff;
+  --accent-hover: #1f6feb;
+  --card-bg: #161b22;
+  --border: #30363d;
+  --success: #3fb950;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 60px;
+  padding: 60px 20px 40px;
+}
+
+h1 {
+  font-size: 3em;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.tagline {
+  font-size: 1.4em;
+  color: var(--text);
+  margin-bottom: 30px;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 30px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s;
+  border: 1px solid var(--border);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+}
+
+.btn-secondary:hover {
+  background: var(--card-bg);
+  border-color: var(--accent);
+}
+
+.terminal {
+  background: #000;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 40px 0;
+  font-family: "Courier New", monospace;
+  overflow-x: auto;
+}
+
+.terminal-line {
+  color: #0f0;
+  margin: 8px 0;
+}
+
+.terminal-prompt {
+  color: var(--accent);
+}
+
+.terminal-output {
+  color: #888;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin: 40px 0;
+}
+
+.feature-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 25px;
+}
+
+.feature-card h3 {
+  color: #fff;
+  margin-bottom: 10px;
+  font-size: 1.3em;
+}
+
+.feature-card p {
+  color: var(--text);
+}
+
+.pricing {
+  text-align: center;
+  margin: 60px 0;
+}
+
+.pricing h2 {
+  color: #fff;
+  font-size: 2.5em;
+  margin-bottom: 40px;
+}
+
+.pricing-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.pricing-card {
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 40px 30px;
+  transition: all 0.3s;
+}
+
+.pricing-card.featured {
+  border-color: var(--accent);
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(88, 166, 255, 0.3);
+}
+
+.pricing-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-5px);
+}
+
+.pricing-card h3 {
+  color: #fff;
+  font-size: 1.8em;
+  margin-bottom: 15px;
+}
+
+.price {
+  font-size: 3em;
+  color: var(--accent);
+  margin: 20px 0;
+  font-weight: bold;
+}
+
+.price-period {
+  font-size: 0.4em;
+  color: var(--text);
+  font-weight: normal;
+}
+
+.features-list {
+  list-style: none;
+  margin: 25px 0;
+  text-align: left;
+}
+
+.features-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.features-list li:last-child {
+  border-bottom: none;
+}
+
+.features-list li::before {
+  content: "✓ ";
+  color: var(--success);
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.badge {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+footer {
+  text-align: center;
+  margin-top: 80px;
+  padding: 40px 20px;
+  border-top: 1px solid var(--border);
+}
+
+footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+code {
+  background: var(--card-bg);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: "Courier New", monospace;
+  color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2em;
+  }
+
+  .tagline {
+    font-size: 1.1em;
+  }
+
+  .pricing-card.featured {
+    transform: scale(1);
+  }
+}

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>journalot - Minimal journaling CLI for developers</title>
+  <meta name="description" content="Just type 'journal' in your terminal and start writing. Git-based version control, zero friction, complete ownership.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>journalot</h1>
+      <p class="tagline">Minimal journaling CLI for developers.</p>
+      <p class="tagline">Just type <code>journal</code> in your terminal and start writing.</p>
+
+      <div class="cta-buttons">
+        <a href="https://github.com/jtaylortech/journalot" class="btn btn-primary">View on GitHub</a>
+        <a href="/pro" class="btn btn-secondary">Get Pro →</a>
+      </div>
+    </header>
+
+    <div class="terminal">
+      <div class="terminal-line">
+        <span class="terminal-prompt">$</span> journal
+      </div>
+      <div class="terminal-line terminal-output"># Opens today's entry in your editor</div>
+      <br>
+      <div class="terminal-line">
+        <span class="terminal-prompt">$</span> journal "Had a breakthrough today"
+      </div>
+      <div class="terminal-line terminal-output"># Quick capture without opening editor</div>
+      <br>
+      <div class="terminal-line">
+        <span class="terminal-prompt">$</span> journal --search "confidence"
+      </div>
+      <div class="terminal-line terminal-output"># Search all your entries</div>
+    </div>
+
+    <section>
+      <h2 style="text-align: center; color: #fff; font-size: 2.5em; margin: 60px 0 40px;">Why journalot?</h2>
+      <p style="text-align: center; font-size: 1.2em; max-width: 700px; margin: 0 auto 40px; color: var(--text);">
+        Every journaling app has the same problem: <strong>friction</strong>. Open app → wait for sync → click new entry → choose template...
+        <br><br>
+        journalot eliminates all of that:
+      </p>
+
+      <div class="features">
+        <div class="feature-card">
+          <h3>Already in Terminal</h3>
+          <p>You're already there. Just type <code>journal</code> and you're writing. Zero context switching.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>Your Editor, Your Rules</h3>
+          <p>Opens in your preferred editor (vim, nano, VSCode). No learning curve, no compromises.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>Git-Native Versioning</h3>
+          <p>Auto-commits to Git. Full history, sync across devices, never lose an entry.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>Just Markdown Files</h3>
+          <p>Complete ownership. Your data, your format, forever accessible. No vendor lock-in.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>Quick Capture</h3>
+          <p><code>journal "text"</code> appends instantly. Perfect for fleeting thoughts and rapid logging.</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>Powerful Search</h3>
+          <p>Find anything with <code>--search</code>, filter by <code>--tag</code>, view stats, export to HTML/PDF.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="margin: 80px 0;">
+      <h2 style="text-align: center; color: #fff; font-size: 2.5em; margin-bottom: 40px;">Features</h2>
+
+      <div style="max-width: 800px; margin: 0 auto;">
+        <h3 style="color: #fff; margin: 30px 0 15px;">Core Features (Free Forever)</h3>
+        <ul class="features-list">
+          <li>Daily journal entries in markdown format</li>
+          <li>Quick capture mode for instant thoughts</li>
+          <li>Search entries by keyword or tag</li>
+          <li>Week view - open all entries from current week</li>
+          <li>Stats dashboard (entries, words, patterns)</li>
+          <li>Export to HTML and PDF</li>
+          <li>Template support for customized entries</li>
+          <li>Daily writing prompts</li>
+          <li>Random entry rediscovery</li>
+          <li>Git diff view for entry history</li>
+          <li>Archive old entries by year</li>
+        </ul>
+
+        <h3 style="color: #fff; margin: 40px 0 15px;">Pro Features</h3>
+        <ul class="features-list">
+          <li>AI-powered insights and pattern analysis</li>
+          <li>Voice capture with transcription</li>
+          <li>GPG encryption for sensitive entries</li>
+          <li>Cloud backup to S3/Dropbox</li>
+          <li>Graph visualization of tags and topics</li>
+        </ul>
+
+        <div style="text-align: center; margin-top: 40px;">
+          <a href="/pro" class="btn btn-primary">Upgrade to Pro →</a>
+        </div>
+      </div>
+    </section>
+
+    <section style="margin: 80px 0;">
+      <h2 style="text-align: center; color: #fff; font-size: 2.5em; margin-bottom: 40px;">Quick Start</h2>
+
+      <div class="terminal">
+        <div class="terminal-line">
+          <span class="terminal-prompt">$</span> git clone https://github.com/jtaylortech/journalot.git
+        </div>
+        <div class="terminal-line">
+          <span class="terminal-prompt">$</span> cd journalot
+        </div>
+        <div class="terminal-line">
+          <span class="terminal-prompt">$</span> sudo ./install.sh
+        </div>
+        <div class="terminal-line terminal-output"># Installation complete!</div>
+        <br>
+        <div class="terminal-line">
+          <span class="terminal-prompt">$</span> journal
+        </div>
+        <div class="terminal-line terminal-output"># Start journaling immediately</div>
+      </div>
+    </section>
+
+    <footer>
+      <p>Built by <a href="https://github.com/jtaylortech">@jtaylortech</a></p>
+      <p>Open source under MIT License</p>
+      <p style="margin-top: 20px;">
+        <a href="https://github.com/jtaylortech/journalot">GitHub</a> •
+        <a href="/pro">Get Pro</a> •
+        <a href="https://github.com/sponsors/jtaylortech">Sponsor</a>
+      </p>
+    </footer>
+  </div>
+</body>
+</html>
