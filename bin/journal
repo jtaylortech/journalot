@@ -38,34 +38,6 @@ check_dependencies() {
     fi
 }
 
-# Check if user has Pro license
-check_pro_license() {
-    if [ -n "$PRO_LICENSE" ]; then
-        # Basic validation (honor system for now)
-        if [ "${#PRO_LICENSE}" -ge 16 ]; then
-            return 0
-        fi
-    fi
-    return 1
-}
-
-# Show pro feature message
-show_pro_message() {
-    local feature="$1"
-    echo -e "${YELLOW}$feature is a Pro feature${NC}"
-    echo ""
-    echo "Upgrade to journalot Pro for:"
-    echo "  • AI insights and summaries"
-    echo "  • Voice capture"
-    echo "  • Advanced encryption"
-    echo "  • Cloud backup"
-    echo "  • Graph visualization"
-    echo ""
-    echo "Learn more: https://journalot.dev/pro"
-    echo "GitHub Sponsors ($50+/month): https://github.com/sponsors/jtaylortech"
-    echo ""
-}
-
 # Determine editor
 get_editor() {
     if [ -n "$EDITOR" ]; then
@@ -126,13 +98,6 @@ OPTIONS:
     --diff DATE             Show git diff for an entry
     --archive YEAR          Archive entries from a year
     --prompt                Show today's writing prompt
-
-PRO FEATURES (requires license):
-    --insights              AI-powered insights and patterns
-    --voice                 Voice capture with transcription
-    --encrypt               Encrypt sensitive entries with GPG
-    --backup                Cloud backup to S3/Dropbox
-    --graph                 Visualize tag connections
 
 EXAMPLES:
     journal                           # Open today's journal
@@ -449,87 +414,6 @@ get_daily_prompt() {
     echo "${prompts[$index]}"
 }
 
-# Pro Feature: AI Insights
-ai_insights() {
-    if ! check_pro_license; then
-        show_pro_message "AI Insights"
-        return 1
-    fi
-
-    echo -e "${BLUE}Analyzing your journal entries...${NC}\n"
-    echo "🚧 AI Insights feature coming soon!"
-    echo ""
-    echo "This will provide:"
-    echo "  • Weekly patterns and themes"
-    echo "  • Mood tracking over time"
-    echo "  • Writing habit analysis"
-    echo "  • Personalized insights"
-}
-
-# Pro Feature: Voice Capture
-voice_capture() {
-    if ! check_pro_license; then
-        show_pro_message "Voice Capture"
-        return 1
-    fi
-
-    echo -e "${BLUE}Voice Capture${NC}\n"
-    echo "🚧 Voice capture feature coming soon!"
-    echo ""
-    echo "This will provide:"
-    echo "  • Record voice memos"
-    echo "  • Automatic transcription"
-    echo "  • Append to today's entry"
-}
-
-# Pro Feature: Encrypt Entry
-encrypt_entry() {
-    if ! check_pro_license; then
-        show_pro_message "Encryption"
-        return 1
-    fi
-
-    echo -e "${BLUE}Encryption${NC}\n"
-    echo "🚧 Encryption feature coming soon!"
-    echo ""
-    echo "This will provide:"
-    echo "  • GPG encryption for sensitive entries"
-    echo "  • Password protection"
-    echo "  • Transparent decryption for viewing"
-}
-
-# Pro Feature: Cloud Backup
-cloud_backup() {
-    if ! check_pro_license; then
-        show_pro_message "Cloud Backup"
-        return 1
-    fi
-
-    echo -e "${BLUE}Cloud Backup${NC}\n"
-    echo "🚧 Cloud backup feature coming soon!"
-    echo ""
-    echo "This will provide:"
-    echo "  • Automatic backup to S3/Dropbox"
-    echo "  • Version history"
-    echo "  • Restore from backup"
-}
-
-# Pro Feature: Graph View
-graph_view() {
-    if ! check_pro_license; then
-        show_pro_message "Graph View"
-        return 1
-    fi
-
-    echo -e "${BLUE}Graph View${NC}\n"
-    echo "🚧 Graph view feature coming soon!"
-    echo ""
-    echo "This will provide:"
-    echo "  • Visualize tag connections"
-    echo "  • Topic relationships"
-    echo "  • Interactive HTML graph"
-}
-
 # Parse arguments
 ENTRY_DATE=$(date '+%Y-%m-%d')
 USE_TIMESTAMP=false
@@ -615,26 +499,6 @@ while [[ $# -gt 0 ]]; do
             ;;
         --prompt)
             get_daily_prompt
-            exit 0
-            ;;
-        --insights)
-            ai_insights
-            exit 0
-            ;;
-        --voice)
-            voice_capture
-            exit 0
-            ;;
-        --encrypt)
-            encrypt_entry
-            exit 0
-            ;;
-        --backup)
-            cloud_backup
-            exit 0
-            ;;
-        --graph)
-            graph_view
             exit 0
             ;;
         -*)
