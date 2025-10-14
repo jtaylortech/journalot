@@ -52,6 +52,15 @@ The best productivity tool is the one you actually use.
 
 ## Installation
 
+### Homebrew (Recommended)
+
+```bash
+brew tap jtaylortech/journalot
+brew install journalot
+```
+
+### Manual Installation
+
 ```bash
 git clone git@github.com:jtaylortech/journalot.git
 cd journalot
