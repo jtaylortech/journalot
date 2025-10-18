@@ -17,7 +17,7 @@ You can also search past entries by keyword or date using command-line tools lik
 -   Smart editor detection (respects `$EDITOR` or falls back to code → vim → nano)
 -   Optional Git integration with auto-commit and push
 -   Template support for customized entry structure
--   Config file support (`~/.journalotrc`)
+-   XDG-compliant config file (`~/.config/journalot/config`)
 
 ### Quick Wins
 -   **Quick capture**: `journal "Had a great idea"` - append to today's entry without opening editor
@@ -118,14 +118,19 @@ journal --export pdf                 # Export to PDF (requires pandoc)
 
 ### Configuration
 
-Create `~/.journalotrc` to customize behavior:
+Create `~/.config/journalot/config` to customize behavior:
 ```bash
 # Auto-sync without prompts
 AUTOSYNC=true
 
+# Disable daily writing prompts
+DISABLE_PROMPTS=true
+
 # Custom journal directory (optional)
 # JOURNAL_DIR="$HOME/my-journal"
 ```
+
+**Note**: Old config files at `~/.journalotrc` will be automatically migrated to the XDG location on first run.
 
 Create `~/journalot/template.md` to customize new entries:
 ```markdown
@@ -142,7 +147,7 @@ Create `~/journalot/template.md` to customize new entries:
 - **Editor**: Set `$EDITOR` environment variable (e.g., `export EDITOR=vim`)
 - **Journal Directory**: Edit `JOURNAL_DIR` in config or `bin/journal` (default: `~/journalot`)
 - **Template**: Create `~/journalot/template.md` for custom entry structure
-- **Auto-sync**: Set `AUTOSYNC=true` in `~/.journalotrc` to skip prompts
+- **Auto-sync**: Set `AUTOSYNC=true` in `~/.config/journalot/config` to skip prompts
 
 ### Tips
 - Quick capture great for fleeting thoughts: `journal "Remember to check that bug"`

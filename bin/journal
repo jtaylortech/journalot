@@ -3,7 +3,19 @@
 set -e
 
 JOURNAL_DIR="$HOME/journalot"
-CONFIG_FILE="$HOME/.journalotrc"
+
+# XDG Base Directory support
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+CONFIG_DIR="$XDG_CONFIG_HOME/journalot"
+CONFIG_FILE="$CONFIG_DIR/config"
+
+# Migrate old config if it exists
+OLD_CONFIG="$HOME/.journalotrc"
+if [ -f "$OLD_CONFIG" ] && [ ! -f "$CONFIG_FILE" ]; then
+    mkdir -p "$CONFIG_DIR"
+    mv "$OLD_CONFIG" "$CONFIG_FILE"
+    echo -e "\033[1;33mMigrated config from ~/.journalotrc to $CONFIG_FILE\033[0m"
+fi
 
 # Load config if it exists
 if [ -f "$CONFIG_FILE" ]; then
@@ -117,7 +129,8 @@ CONFIGURATION:
     Editor: \$EDITOR (fallback: code > vim > nano)
 
     Config options (in $CONFIG_FILE):
-      AUTOSYNC=true         # Skip commit/push prompts
+      AUTOSYNC=true              # Skip commit/push prompts
+      DISABLE_PROMPTS=true       # Disable daily writing prompts
 EOF
 }
 
