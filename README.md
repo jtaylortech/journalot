@@ -86,47 +86,20 @@ Your journal entries are stored in `~/journalot/` (the journal directory), NOT i
 
 **Note**: The branch name can be configured - see Configuration section below.
 
-## End-to-End Encryption (Optional)
+## Privacy & Security
 
-For sensitive journal entries, you can enable encryption at rest using git's smudge/clean filters with GPG. This keeps files encrypted in the repository while allowing easy local access.
+Your journal entries are:
+- **Stored locally** as plain markdown files in `~/journalot/entries/`
+- **Optionally synced** to a private GitHub repository you control
+- **Encrypted in transit** when using SSH (git@github.com URLs)
+- **Protected by GitHub's access controls** if using a private repo
 
-### Setup Encryption
+For additional security, use:
+- Encrypted filesystem (FileVault on macOS, LUKS on Linux)
+- Private repository with restricted access
+- SSH keys with passphrase protection
 
-1. Install GPG if not already installed:
-```bash
-brew install gnupg  # macOS
-# or
-apt-get install gnupg  # Linux
-```
-
-2. Generate a GPG key (if you don't have one):
-```bash
-gpg --full-generate-key
-```
-
-3. Configure git filters in `~/journalot/.git/config`:
-```ini
-[filter "gpg"]
-    clean = gpg --encrypt --recipient your-email@example.com
-    smudge = gpg --decrypt --quiet --yes --batch
-    required = true
-```
-
-4. Create `~/journalot/.gitattributes`:
-```
-*.md filter=gpg diff=gpg
-```
-
-5. Test it:
-```bash
-cd ~/journalot
-git add .gitattributes
-git commit -m "Enable encryption"
-```
-
-Now all `.md` files will be encrypted when committed and decrypted when checked out. Your journal remains private even if the repository is compromised.
-
-**Note**: Keep your GPG key backed up securely! Without it, you cannot decrypt your entries.
+**Note**: Entries are stored as plain text locally and in your git repository. If you need encryption at rest, consider using full-disk encryption or an encrypted git remote.
 
 ## Usage
 
