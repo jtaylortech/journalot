@@ -3,10 +3,13 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Bash](https://img.shields.io/badge/bash-4.0+-green.svg)
+![Version](https://img.shields.io/badge/version-4.5-blue.svg)
 
 **Minimal journaling CLI for developers. Just type `journal` in your terminal and start writing.**
 
-`journalot` is a CLI tool for maintaining a daily markdown journal with Git-based version control. It's designed to be lightweight and easy to use, promoting mindfulness and reflection. 
+`journalot` is a CLI tool for maintaining a daily markdown journal with Git-based version control. It's designed to be lightweight and easy to use, promoting mindfulness and reflection.
+
+**✨ New in v4.5:** Natural language dates, enhanced search with context, backup/restore, and customizable day-specific prompts! 
 
 You can also search past entries by keyword or date using command-line tools like grep or fzf. For example, grep "confidence" or "new idea" ~/journalot/entries/*.md
 
@@ -23,11 +26,13 @@ You can also search past entries by keyword or date using command-line tools lik
 -   **Quick capture**: `journal "Had a great idea"` - append to today's entry without opening editor
 -   **Enhanced list view**: Word count and preview for each entry
 -   **Auto-sync**: Set `AUTOSYNC=true` in config to skip commit/push prompts
+-   **Natural language dates**: `--date "last friday"` or `--date "3 days ago"`
 -   **Previous entries**: `--yesterday` or `--date` to access any day
+-   **Backup & restore**: `--backup` and `--restore` for easy backups
 
 ### Power Features
 -   **Stats**: `--stats` shows total entries, words, and patterns (non-gamified)
--   **Search**: `--search "keyword"` to find entries containing text
+-   **Enhanced search**: `--search "keyword"` with context lines and highlighting
 -   **Week view**: `--week` opens all entries from current week
 -   **Timestamps**: `--time` creates multiple entries per day (e.g., `2025-01-15-1430.md`)
 -   **Tags**: Filter entries by hashtag with `--tag work`
@@ -35,7 +40,7 @@ You can also search past entries by keyword or date using command-line tools lik
 -   **Random entry**: `--random` rediscover old thoughts
 -   **Diff view**: `--diff DATE` see what changed in an entry
 -   **Archive**: `--archive YEAR` move old years to archive folder
--   **Daily prompts**: Writing prompts for blank entries (disable with `DISABLE_PROMPTS=true`)
+-   **Customizable prompts**: Daily writing prompts (custom + day-of-week specific)
 
 
 ## Why journalot?
@@ -109,14 +114,22 @@ journal                              # Open today's journal
 journal "Had a breakthrough today"   # Quick capture (append without editor)
 journal --yesterday                  # Open yesterday's journal
 journal --date 2025-01-15            # Open specific date
+journal --date "last friday"         # Natural language dates
+journal --date "3 days ago"          # Relative dates
 journal --time                       # Create timestamped entry (multiple per day)
 journal --list                       # List all entries with previews
 journal --help                       # Show help
 ```
 
+**Natural language dates** support:
+- `"yesterday"`, `"tomorrow"`
+- `"X days ago"`, `"X weeks ago"` (e.g., `"5 days ago"`)
+- `"last monday"`, `"last friday"`, etc.
+- Standard formats like `2025-01-15`
+
 ### Search & Discovery
 ```bash
-journal --search "confidence"        # Search all entries for keyword
+journal --search "confidence"        # Search with context and highlighting
 journal --week                       # Open all entries from this week
 journal --tag work                   # Filter entries by #tag
 journal --stats                      # View journal statistics
@@ -124,6 +137,19 @@ journal --random                     # Show a random entry
 journal --diff 2025-01-15            # See git history for an entry
 journal --prompt                     # Show today's writing prompt
 ```
+
+**Enhanced search** shows 2 lines of context before/after matches with color highlighting.
+
+### Backup & Restore
+```bash
+journal --backup                     # Create timestamped backup
+journal --restore                    # Restore from backup (interactive)
+```
+
+Backups are stored in `~/journalot/backups/` as compressed archives. The restore command:
+- Shows all available backups with sizes and dates
+- Creates a safety backup before restoring
+- Fully interactive with confirmation prompts
 
 ### Archive & Organization
 ```bash
@@ -167,6 +193,26 @@ Create `~/journalot/template.md` to customize new entries:
 ## Tomorrow's focus
 ```
 
+### Custom Prompts
+
+**Option 1: General custom prompts** - Create `~/journalot/prompts.md` with one prompt per line:
+```
+What am I working towards?
+What patterns am I noticing?
+What decision needs to be made?
+```
+
+**Option 2: Day-specific prompts** - Create files for specific days (e.g., `~/journalot/prompts-monday.md`):
+```bash
+~/journalot/prompts-monday.md       # Monday prompts: "What are your goals for the week?"
+~/journalot/prompts-friday.md       # Friday prompts: "What did you accomplish this week?"
+~/journalot/prompts-sunday.md       # Sunday prompts: "What are you grateful for?"
+```
+
+**Priority order**: Day-specific prompts → Custom prompts → Default prompts
+
+Each file should contain one prompt per line. Day-specific files choose a random prompt, while general prompts rotate daily.
+
 ### Customization
 - **Editor**: Set `$EDITOR` environment variable (e.g., `export EDITOR=vim`)
 - **Journal Directory**: Edit `JOURNAL_DIR` in config or `bin/journal` (default: `~/journalot`)
@@ -175,12 +221,14 @@ Create `~/journalot/template.md` to customize new entries:
 
 ### Tips
 - Quick capture great for fleeting thoughts: `journal "Remember to check that bug"`
+- Use natural language dates: `journal --date "last monday"` is more intuitive
+- Search shows context - perfect for finding related thoughts
+- Regular backups: Run `journal --backup` before major changes
 - Use tags for organization: add `#work`, `#personal`, `#ideas` to entries
-- Search is case-insensitive and shows line numbers
 - Week view opens all entries in your editor at once
 - Stats are informational only - no guilt for skipping days
 - Templates support `{{date}}` placeholder
-- Daily prompts rotate based on day of year (disable with `DISABLE_PROMPTS=true`)
+- Custom prompts: Create day-specific prompts for Monday planning, Friday reflection, etc.
 - Archive old entries to keep your main folder clean
 - Use `--random` for serendipitous rediscovery
 

@@ -2,7 +2,7 @@
 
 set -e
 
-JOURNAL_DIR="$HOME/journalot"
+JOURNAL_DIR="${JOURNAL_DIR:-$HOME/journalot}"
 
 # XDG Base Directory support
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
@@ -60,6 +60,69 @@ check_dependencies() {
     if ! command -v git &> /dev/null; then
         error_exit "git is not installed. Please install git first."
     fi
+}
+
+# Parse natural language dates
+parse_date() {
+    local input="$1"
+
+    # Try to parse as natural language using date command
+    # Linux uses -d, macOS uses -j -f for parsing but we'll use a simpler approach
+    local parsed_date
+
+    # Try Linux date first
+    parsed_date=$(date -d "$input" '+%Y-%m-%d' 2>/dev/null)
+
+    # If that fails, try macOS date with common patterns
+    if [ -z "$parsed_date" ]; then
+        case "$input" in
+            "yesterday")
+                parsed_date=$(date -v-1d '+%Y-%m-%d' 2>/dev/null)
+                ;;
+            "tomorrow")
+                parsed_date=$(date -v+1d '+%Y-%m-%d' 2>/dev/null)
+                ;;
+            *"days ago")
+                local days=$(echo "$input" | grep -o '[0-9]*')
+                parsed_date=$(date -v-${days}d '+%Y-%m-%d' 2>/dev/null)
+                ;;
+            *"weeks ago")
+                local weeks=$(echo "$input" | grep -o '[0-9]*')
+                local days=$((weeks * 7))
+                parsed_date=$(date -v-${days}d '+%Y-%m-%d' 2>/dev/null)
+                ;;
+            "last week")
+                parsed_date=$(date -v-7d '+%Y-%m-%d' 2>/dev/null)
+                ;;
+            "last monday"|"last Monday")
+                parsed_date=$(date -v-Mon -v-1w '+%Y-%m-%d' 2>/dev/null)
+                ;;
+            "last tuesday"|"last Tuesday")
+                parsed_date=$(date -v-Tue -v-1w '+%Y-%m-%d' 2>/dev/null)
+                ;;
+            "last wednesday"|"last Wednesday")
+                parsed_date=$(date -v-Wed -v-1w '+%Y-%m-%d' 2>/dev/null)
+                ;;
+            "last thursday"|"last Thursday")
+                parsed_date=$(date -v-Thu -v-1w '+%Y-%m-%d' 2>/dev/null)
+                ;;
+            "last friday"|"last Friday")
+                parsed_date=$(date -v-Fri -v-1w '+%Y-%m-%d' 2>/dev/null)
+                ;;
+            "last saturday"|"last Saturday")
+                parsed_date=$(date -v-Sat -v-1w '+%Y-%m-%d' 2>/dev/null)
+                ;;
+            "last sunday"|"last Sunday")
+                parsed_date=$(date -v-Sun -v-1w '+%Y-%m-%d' 2>/dev/null)
+                ;;
+            *)
+                # If still nothing, assume it's a regular date format
+                parsed_date="$input"
+                ;;
+        esac
+    fi
+
+    echo "$parsed_date"
 }
 
 # Determine editor
@@ -122,12 +185,16 @@ OPTIONS:
     --diff DATE             Show git diff for an entry
     --archive YEAR          Archive entries from a year
     --prompt                Show today's writing prompt
+    --backup                Create a backup of all journal entries
+    --restore               Restore journal from a backup
 
 EXAMPLES:
     journal                           # Open today's journal
     journal "Had a great idea today"  # Quick capture (append without editor)
     journal --yesterday               # Open yesterday's journal
     journal --date 2025-01-15         # Open specific date
+    journal --date "last friday"      # Natural language dates
+    journal --date "3 days ago"       # Relative dates
     journal --time                    # Create timestamped entry
     journal --search "confidence"     # Search all entries
     journal --week                    # Open this week's entries
@@ -176,11 +243,27 @@ search_entries() {
         error_exit "Search query required"
     fi
 
+    if [ ! -d "$JOURNAL_DIR/entries" ]; then
+        error_exit "No entries directory found"
+    fi
+
     echo -e "${BLUE}Searching for: ${NC}$query\n"
-    grep -i -n -H "$query" "$JOURNAL_DIR/entries"/*.md 2>/dev/null | while IFS=: read -r file line content; do
-        local filename=$(basename "$file")
-        echo -e "${GREEN}$filename${NC}:${YELLOW}$line${NC}: $content"
-    done
+
+    # Use grep with context lines and color highlighting
+    # -i: case insensitive, -n: line numbers, -H: filename, -A2 -B2: 2 lines before/after
+    local matches=$(find "$JOURNAL_DIR/entries" -name "*.md" -type f -exec grep -l -i "$query" {} \; 2>/dev/null)
+
+    if [ -z "$matches" ]; then
+        echo -e "${YELLOW}No matches found${NC}"
+        return
+    fi
+
+    # Show matches with context
+    find "$JOURNAL_DIR/entries" -name "*.md" -type f -exec grep -H -n -i -A 2 -B 2 --color=always "$query" {} \; 2>/dev/null
+
+    # Show count
+    local count=$(echo "$matches" | wc -l | tr -d ' ')
+    echo -e "\n${BLUE}Found in $count entries${NC}"
 }
 
 # Show stats
@@ -408,8 +491,124 @@ archive_entries() {
     fi
 }
 
+# Backup journal
+backup_journal() {
+    local backup_dir="$JOURNAL_DIR/backups"
+    local timestamp=$(date '+%Y%m%d-%H%M%S')
+    local backup_file="$backup_dir/journal-backup-$timestamp.tar.gz"
+
+    mkdir -p "$backup_dir"
+
+    echo -e "${BLUE}Creating backup...${NC}"
+
+    # Create compressed archive of entries
+    if tar -czf "$backup_file" -C "$JOURNAL_DIR" entries 2>/dev/null; then
+        local size=$(du -h "$backup_file" | cut -f1)
+        success_msg "✅ Backup created: journal-backup-$timestamp.tar.gz ($size)"
+        echo "   Location: $backup_file"
+    else
+        error_exit "Failed to create backup"
+    fi
+}
+
+# Restore journal from backup
+restore_journal() {
+    local backup_dir="$JOURNAL_DIR/backups"
+
+    if [ ! -d "$backup_dir" ]; then
+        error_exit "No backups directory found"
+    fi
+
+    echo -e "${BLUE}Available backups:${NC}\n"
+
+    local backups=($(ls -t "$backup_dir"/journal-backup-*.tar.gz 2>/dev/null))
+
+    if [ ${#backups[@]} -eq 0 ]; then
+        error_exit "No backups found"
+    fi
+
+    local i=1
+    for backup in "${backups[@]}"; do
+        local filename=$(basename "$backup")
+        local size=$(du -h "$backup" | cut -f1)
+        local date=$(echo "$filename" | sed 's/journal-backup-\(.*\)\.tar\.gz/\1/' | sed 's/\([0-9]\{8\}\)-\([0-9]\{6\}\)/\1 \2/')
+        echo "  $i) $date ($size)"
+        ((i++))
+    done
+
+    echo ""
+    echo -n "Select backup to restore (1-${#backups[@]}), or 'c' to cancel: "
+    read -r selection
+
+    if [[ "$selection" =~ ^[Cc]$ ]]; then
+        echo "Cancelled"
+        return
+    fi
+
+    if ! [[ "$selection" =~ ^[0-9]+$ ]] || [ "$selection" -lt 1 ] || [ "$selection" -gt ${#backups[@]} ]; then
+        error_exit "Invalid selection"
+    fi
+
+    local selected_backup="${backups[$((selection-1))]}"
+
+    warn_msg "⚠️  This will replace your current entries!"
+    echo -n "Are you sure? Type 'yes' to confirm: "
+    read -r confirm
+
+    if [ "$confirm" != "yes" ]; then
+        echo "Cancelled"
+        return
+    fi
+
+    # Backup current state before restoring
+    echo "Creating safety backup of current state..."
+    backup_journal
+
+    # Restore
+    echo -e "${BLUE}Restoring from backup...${NC}"
+    if tar -xzf "$selected_backup" -C "$JOURNAL_DIR" 2>/dev/null; then
+        success_msg "✅ Journal restored successfully"
+    else
+        error_exit "Failed to restore backup"
+    fi
+}
+
 # Get daily prompt
 get_daily_prompt() {
+    local day_of_week=$(date '+%A' | tr '[:upper:]' '[:lower:]')
+    local day_prompt_file="$JOURNAL_DIR/prompts-${day_of_week}.md"
+    local custom_prompts_file="$JOURNAL_DIR/prompts.md"
+
+    # Priority 1: Check for day-of-week specific prompts
+    if [ -f "$day_prompt_file" ] && [ -s "$day_prompt_file" ]; then
+        # Read random line from day-specific prompt file
+        local count=$(wc -l < "$day_prompt_file" | tr -d ' ')
+        if [ "$count" -gt 0 ]; then
+            local random_line=$((RANDOM % count + 1))
+            local prompt=$(sed -n "${random_line}p" "$day_prompt_file")
+            if [ -n "$prompt" ]; then
+                echo "$prompt"
+                return
+            fi
+        fi
+    fi
+
+    # Priority 2: Check for custom prompts file
+    if [ -f "$custom_prompts_file" ] && [ -s "$custom_prompts_file" ]; then
+        local count=$(wc -l < "$custom_prompts_file" | tr -d ' ')
+        if [ "$count" -gt 0 ]; then
+            # Use day of year for consistent daily prompt from custom file
+            local day_of_year=$(date '+%j')
+            local line_num=$((day_of_year % count + 1))
+            local prompt=$(sed -n "${line_num}p" "$custom_prompts_file")
+            if [ -n "$prompt" ]; then
+                echo "$prompt"
+                return
+            fi
+        fi
+    fi
+
+    # Priority 3: Default prompts
     local prompts=(
         "What made you smile today?"
         "What challenged you today?"
@@ -463,7 +662,7 @@ while [[ $# -gt 0 ]]; do
             if [ -z "$2" ]; then
                 error_exit "Date argument required for --date flag"
             fi
-            ENTRY_DATE="$2"
+            ENTRY_DATE=$(parse_date "$2")
             shift 2
             ;;
         -t|--time)
@@ -527,6 +726,14 @@ while [[ $# -gt 0 ]]; do
             get_daily_prompt
             exit 0
             ;;
+        --backup)
+            backup_journal
+            exit 0
+            ;;
+        --restore)
+            restore_journal
+            exit 0
+            ;;
         -*)
             error_exit "Unknown option: $1\nUse --help for usage information"
             ;;
@@ -585,7 +792,7 @@ if [ ! -f "$FILENAME" ]; then
 
         # Add daily prompt if not disabled
         if [ "$DISABLE_PROMPTS" != "true" ]; then
-            local prompt=$(get_daily_prompt)
+            prompt=$(get_daily_prompt)
             echo "**Prompt**: $prompt" >> "$FILENAME"
             echo "" >> "$FILENAME"
         fi
