@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 
@@ -22,12 +22,24 @@ if [ -f "$CONFIG_FILE" ]; then
     source "$CONFIG_FILE"
 fi
 
-# Color codes for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+# Default git branch (can be overridden in config)
+GIT_BRANCH="${GIT_BRANCH:-main}"
+
+# Color codes for output using tput (falls back to ANSI if tput unavailable)
+if command -v tput &> /dev/null && tput setaf 1 &> /dev/null; then
+    RED=$(tput setaf 1)
+    GREEN=$(tput setaf 2)
+    YELLOW=$(tput bold; tput setaf 3)
+    BLUE=$(tput setaf 4)
+    NC=$(tput sgr0)
+else
+    # Fallback to ANSI escape codes
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[1;33m'
+    BLUE='\033[0;34m'
+    NC='\033[0m'
+fi
 
 # Error handling
 error_exit() {
@@ -131,6 +143,7 @@ CONFIGURATION:
     Config options (in $CONFIG_FILE):
       AUTOSYNC=true              # Skip commit/push prompts
       DISABLE_PROMPTS=true       # Disable daily writing prompts
+      GIT_BRANCH=main            # Git branch name (default: main)
 EOF
 }
 
@@ -554,7 +567,7 @@ init_repo || USE_GIT=false
 # Pull latest changes if git is available
 if [ "$USE_GIT" = true ] && git remote get-url origin &> /dev/null; then
     echo "Syncing with remote..."
-    if ! git pull origin main --rebase 2>/dev/null; then
+    if ! git pull origin "$GIT_BRANCH" --rebase 2>/dev/null; then
         warn_msg "Failed to pull from remote. Continuing with local changes..."
     fi
 fi
@@ -610,7 +623,7 @@ if [ "$USE_GIT" = true ]; then
             git commit -m "Journal entry for $ENTRY_DATE"
 
             if git remote get-url origin &> /dev/null; then
-                if git push origin main; then
+                if git push origin "$GIT_BRANCH"; then
                     success_msg "✅ Changes auto-committed and pushed!"
                 else
                     warn_msg "Failed to push. Run 'git push' manually when ready."
@@ -631,7 +644,7 @@ if [ "$USE_GIT" = true ]; then
                     read -r push_response
 
                     if [[ "$push_response" =~ ^[Yy]$ ]]; then
-                        if git push origin main; then
+                        if git push origin "$GIT_BRANCH"; then
                             success_msg "✅ Changes committed and pushed!"
                         else
                             warn_msg "Failed to push. Run 'git push' manually when ready."

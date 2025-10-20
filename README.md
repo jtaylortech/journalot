@@ -71,14 +71,62 @@ sudo ./install.sh
 If you want to sync across devices, set up SSH access for GitHub. [Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
 
 ## Set Up Your Own Private Journal Repo
-By default, this repo points to my public GitHub. To push your own journal entries:
-1. Create a new private repo on GitHub (e.g., `journalot-private`)
-2. Replace the remote:
+Your journal entries are stored in `~/journalot/` (the journal directory), NOT in the cloned `journalot` repository. To enable git-based syncing for your personal journal entries:
+
+1. Create a new private repo on GitHub (e.g., `my-private-journal`)
+2. Initialize git in your journal directory and add the remote:
 ```bash
-   git remote remove origin
-   git remote add origin git@github.com:<your-username>/journalot-private.git
+   cd ~/journalot
+   git init
+   git remote add origin git@github.com:<your-username>/my-private-journal.git
+   git add .
+   git commit -m "Initial journal setup"
    git push -u origin main
  ```
+
+**Note**: The branch name can be configured - see Configuration section below.
+
+## End-to-End Encryption (Optional)
+
+For sensitive journal entries, you can enable encryption at rest using git's smudge/clean filters with GPG. This keeps files encrypted in the repository while allowing easy local access.
+
+### Setup Encryption
+
+1. Install GPG if not already installed:
+```bash
+brew install gnupg  # macOS
+# or
+apt-get install gnupg  # Linux
+```
+
+2. Generate a GPG key (if you don't have one):
+```bash
+gpg --full-generate-key
+```
+
+3. Configure git filters in `~/journalot/.git/config`:
+```ini
+[filter "gpg"]
+    clean = gpg --encrypt --recipient your-email@example.com
+    smudge = gpg --decrypt --quiet --yes --batch
+    required = true
+```
+
+4. Create `~/journalot/.gitattributes`:
+```
+*.md filter=gpg diff=gpg
+```
+
+5. Test it:
+```bash
+cd ~/journalot
+git add .gitattributes
+git commit -m "Enable encryption"
+```
+
+Now all `.md` files will be encrypted when committed and decrypted when checked out. Your journal remains private even if the repository is compromised.
+
+**Note**: Keep your GPG key backed up securely! Without it, you cannot decrypt your entries.
 
 ## Usage
 
@@ -125,6 +173,9 @@ AUTOSYNC=true
 
 # Disable daily writing prompts
 DISABLE_PROMPTS=true
+
+# Custom git branch name (default: main)
+GIT_BRANCH=master
 
 # Custom journal directory (optional)
 # JOURNAL_DIR="$HOME/my-journal"
