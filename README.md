@@ -3,13 +3,13 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Bash](https://img.shields.io/badge/bash-4.0+-green.svg)
-![Version](https://img.shields.io/badge/version-4.5-blue.svg)
+![Version](https://img.shields.io/badge/version-4.6-blue.svg)
 
 **Minimal journaling CLI for developers. Just type `journal` in your terminal and start writing.**
 
 `journalot` is a CLI tool for maintaining a daily markdown journal with Git-based version control. It's designed to be lightweight and easy to use, promoting mindfulness and reflection.
 
-**✨ New in v4.5:** Natural language dates, enhanced search with context, backup/restore, and customizable day-specific prompts! 
+**✨ New in v4.6:** List sort control with `--oldest-first` flag! Plus natural language dates, enhanced search, backup/restore, and customizable prompts. 
 
 You can also search past entries by keyword or date using command-line tools like grep or fzf. For example, grep "confidence" or "new idea" ~/journalot/entries/*.md
 
@@ -24,7 +24,7 @@ You can also search past entries by keyword or date using command-line tools lik
 
 ### Quick Wins
 -   **Quick capture**: `journal "Had a great idea"` - append to today's entry without opening editor
--   **Enhanced list view**: Word count and preview for each entry
+-   **Enhanced list view**: Word count and preview for each entry (newest first, or use `--oldest-first`)
 -   **Auto-sync**: Set `AUTOSYNC=true` in config to skip commit/push prompts
 -   **Natural language dates**: `--date "last friday"` or `--date "3 days ago"`
 -   **Previous entries**: `--yesterday` or `--date` to access any day
