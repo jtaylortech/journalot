@@ -172,7 +172,8 @@ USAGE:
 
 OPTIONS:
     -h, --help              Show this help message
-    -l, --list              List all journal entries with previews
+    -l, --list              List all journal entries with previews (newest first)
+        --oldest-first      List entries oldest first (use with --list)
     -y, --yesterday         Open yesterday's entry
     -d, --date DATE         Open entry for specific date (YYYY-MM-DD)
     -t, --time              Create timestamped entry (multiple per day)
@@ -189,9 +190,11 @@ OPTIONS:
     --restore               Restore journal from a backup
 
 EXAMPLES:
-    journal                           # Open today's journal
-    journal "Had a great idea today"  # Quick capture (append without editor)
-    journal --yesterday               # Open yesterday's journal
+    journal                                # Open today's journal
+    journal "Had a great idea today"       # Quick capture (append without editor)
+    journal --list                         # List entries (newest first)
+    journal --list --oldest-first          # List entries (oldest first)
+    journal --yesterday                    # Open yesterday's journal
     journal --date 2025-01-15         # Open specific date
     journal --date "last friday"      # Natural language dates
     journal --date "3 days ago"       # Relative dates
@@ -216,24 +219,42 @@ EOF
 
 # List all entries with details
 list_entries() {
+    local sort_order="$1"
     if [ ! -d "$JOURNAL_DIR/entries" ]; then
         error_exit "No entries directory found at $JOURNAL_DIR/entries"
     fi
 
     echo -e "${BLUE}Journal entries:${NC}\n"
-    find "$JOURNAL_DIR/entries" -name "*.md" -type f | sort -r | while read -r file; do
-        local filename=$(basename "$file")
-        local wordcount=$(wc -w < "$file" | tr -d ' ')
-        local preview=$(head -2 "$file" | tail -1 | cut -c1-60)
 
-        if [ -z "$preview" ]; then
-            preview="(empty)"
-        fi
+    if [ "$sort_order" = "oldest-first" ]; then
+        find "$JOURNAL_DIR/entries" -name "*.md" -type f | sort | while read -r file; do
+            local filename=$(basename "$file")
+            local wordcount=$(wc -w < "$file" | tr -d ' ')
+            local preview=$(head -2 "$file" | tail -1 | cut -c1-60)
 
-        printf "  %s " "$filename"
-        printf "${YELLOW}(%s words)${NC}\n" "$wordcount"
-        printf "    %s\n\n" "$preview"
-    done
+            if [ -z "$preview" ]; then
+                preview="(empty)"
+            fi
+
+            printf "  %s " "$filename"
+            printf "${YELLOW}(%s words)${NC}\n" "$wordcount"
+            printf "    %s\n\n" "$preview"
+        done
+    else
+        find "$JOURNAL_DIR/entries" -name "*.md" -type f | sort -r | while read -r file; do
+            local filename=$(basename "$file")
+            local wordcount=$(wc -w < "$file" | tr -d ' ')
+            local preview=$(head -2 "$file" | tail -1 | cut -c1-60)
+
+            if [ -z "$preview" ]; then
+                preview="(empty)"
+            fi
+
+            printf "  %s " "$filename"
+            printf "${YELLOW}(%s words)${NC}\n" "$wordcount"
+            printf "    %s\n\n" "$preview"
+        done
+    fi
 }
 
 # Search entries
@@ -643,6 +664,7 @@ get_daily_prompt() {
 ENTRY_DATE=$(date '+%Y-%m-%d')
 USE_TIMESTAMP=false
 QUICK_CAPTURE=""
+LIST_SORT_ORDER=""
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -651,8 +673,19 @@ while [[ $# -gt 0 ]]; do
             exit 0
             ;;
         -l|--list)
-            list_entries
+            shift
+            # Check if next arg is --oldest-first
+            if [[ "$1" == "--oldest-first" ]]; then
+                LIST_SORT_ORDER="oldest-first"
+                shift
+            fi
+            list_entries "$LIST_SORT_ORDER"
             exit 0
+            ;;
+        --oldest-first)
+            # This handles the case where --oldest-first appears before --list
+            LIST_SORT_ORDER="oldest-first"
+            shift
             ;;
         -y|--yesterday)
             ENTRY_DATE=$(date -v-1d '+%Y-%m-%d' 2>/dev/null || date -d 'yesterday' '+%Y-%m-%d' 2>/dev/null)

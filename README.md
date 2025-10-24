@@ -117,7 +117,8 @@ journal --date 2025-01-15            # Open specific date
 journal --date "last friday"         # Natural language dates
 journal --date "3 days ago"          # Relative dates
 journal --time                       # Create timestamped entry (multiple per day)
-journal --list                       # List all entries with previews
+journal --list                       # List all entries (newest first)
+journal --list --oldest-first        # List entries oldest first
 journal --help                       # Show help
 ```
 
