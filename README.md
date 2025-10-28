@@ -3,13 +3,14 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Bash](https://img.shields.io/badge/bash-4.0+-green.svg)
-![Version](https://img.shields.io/badge/version-4.6-blue.svg)
+![Version](https://img.shields.io/badge/version-4.7-blue.svg)
+![GitHub stars](https://img.shields.io/github/stars/jtaylortech/journalot?style=social)
 
 **Minimal journaling CLI for developers. Just type `journal` in your terminal and start writing.**
 
 `journalot` is a CLI tool for maintaining a daily markdown journal with Git-based version control. It's designed to be lightweight and easy to use, promoting mindfulness and reflection.
 
-**✨ New in v4.6:** List sort control with `--oldest-first` flag! Plus natural language dates, enhanced search, backup/restore, and customizable prompts. 
+**✨ New in v4.7:** Improved error messages with actionable instructions! Plus list sort control with `--oldest-first` flag, natural language dates, enhanced search, backup/restore, and customizable prompts. 
 
 You can also search past entries by keyword or date using command-line tools like grep or fzf. For example, grep "confidence" or "new idea" ~/journalot/entries/*.md
 
@@ -232,6 +233,26 @@ Each file should contain one prompt per line. Day-specific files choose a random
 - Custom prompts: Create day-specific prompts for Monday planning, Friday reflection, etc.
 - Archive old entries to keep your main folder clean
 - Use `--random` for serendipitous rediscovery
+
+---
+
+## Support journalot
+
+If journalot helps you stay consistent with journaling, consider supporting its development:
+
+**[💖 Sponsor on GitHub](https://github.com/sponsors/jtaylortech)** | **[Learn more](https://journalot.dev/sponsor)**
+
+Your sponsorship helps:
+- Maintain cross-platform compatibility
+- Develop new features and improvements
+- Provide timely bug fixes and support
+- Keep the project free and open-source forever
+
+### Current Sponsors
+
+_Thank you to all sponsors! Your support makes journalot possible._
+
+<!-- sponsors --><!-- sponsors -->
 
 ---
 
