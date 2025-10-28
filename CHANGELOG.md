@@ -5,6 +5,15 @@ All notable changes to journalot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- **Improved error messages** - All error messages now include actionable instructions:
+  - Installation errors show exact commands to fix missing directories
+  - "Not found" errors explain how to create what's missing
+  - Permission errors suggest alternative solutions
+  - Maintains clean, minimal aesthetic with concise help text
+
 ## [4.6.0] - 2025-10-24
 
 ### Added
