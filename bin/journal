@@ -221,7 +221,7 @@ EOF
 list_entries() {
     local sort_order="$1"
     if [ ! -d "$JOURNAL_DIR/entries" ]; then
-        error_exit "No entries directory found at $JOURNAL_DIR/entries"
+        error_exit "No entries directory found at $JOURNAL_DIR/entries\n\nTo create your first entry, run:\n  journal"
     fi
 
     echo -e "${BLUE}Journal entries:${NC}\n"
@@ -265,7 +265,7 @@ search_entries() {
     fi
 
     if [ ! -d "$JOURNAL_DIR/entries" ]; then
-        error_exit "No entries directory found"
+        error_exit "No entries directory found\n\nTo create your first entry, run:\n  journal"
     fi
 
     echo -e "${BLUE}Searching for: ${NC}$query\n"
@@ -290,7 +290,7 @@ search_entries() {
 # Show stats
 show_stats() {
     if [ ! -d "$JOURNAL_DIR/entries" ]; then
-        error_exit "No entries directory found"
+        error_exit "No entries directory found\n\nTo create your first entry, run:\n  journal"
     fi
 
     local total_entries=$(find "$JOURNAL_DIR/entries" -name "*.md" -type f | wc -l | tr -d ' ')
@@ -439,13 +439,13 @@ quick_capture() {
 # Random entry
 show_random() {
     if [ ! -d "$JOURNAL_DIR/entries" ]; then
-        error_exit "No entries directory found"
+        error_exit "No entries directory found\n\nTo create your first entry, run:\n  journal"
     fi
 
     local files=($(find "$JOURNAL_DIR/entries" -name "*.md" -type f))
 
     if [ ${#files[@]} -eq 0 ]; then
-        error_exit "No journal entries found"
+        error_exit "No journal entries found\n\nTo create your first entry, run:\n  journal"
     fi
 
     local random_index=$((RANDOM % ${#files[@]}))
@@ -466,7 +466,7 @@ show_diff() {
     local filename="$JOURNAL_DIR/entries/$target_date.md"
 
     if [ ! -f "$filename" ]; then
-        error_exit "No entry found for $target_date"
+        error_exit "No entry found for $target_date\n\nTo create an entry for this date, run:\n  journal --date $target_date"
     fi
 
     cd "$JOURNAL_DIR" || error_exit "Cannot access journal directory"
@@ -487,7 +487,7 @@ archive_entries() {
     if [ "$unarchive" = "--unarchive" ]; then
         # Restore from archive
         if [ ! -d "$JOURNAL_DIR/archive/$year" ]; then
-            error_exit "No archive found for $year"
+            error_exit "No archive found for $year\n\nTo see available archives, run:\n  ls $JOURNAL_DIR/archive/"
         fi
 
         echo -e "${BLUE}Restoring $year entries from archive...${NC}"
@@ -502,7 +502,7 @@ archive_entries() {
         local count=$(find "$JOURNAL_DIR/entries" -name "$year-*.md" -type f 2>/dev/null | wc -l | tr -d ' ')
 
         if [ "$count" -eq 0 ]; then
-            error_exit "No entries found for $year"
+            error_exit "No entries found for $year\n\nTo see all entries, run:\n  journal --list"
         fi
 
         echo -e "${BLUE}Archiving $count entries from $year...${NC}"
@@ -537,7 +537,7 @@ restore_journal() {
     local backup_dir="$JOURNAL_DIR/backups"
 
     if [ ! -d "$backup_dir" ]; then
-        error_exit "No backups directory found"
+        error_exit "No backups directory found\n\nTo create a backup, run:\n  journal --backup"
     fi
 
     echo -e "${BLUE}Available backups:${NC}\n"
@@ -545,7 +545,7 @@ restore_journal() {
     local backups=($(ls -t "$backup_dir"/journal-backup-*.tar.gz 2>/dev/null))
 
     if [ ${#backups[@]} -eq 0 ]; then
-        error_exit "No backups found"
+        error_exit "No backups found\n\nTo create a backup, run:\n  journal --backup"
     fi
 
     local i=1
@@ -797,8 +797,16 @@ fi
 
 EDITOR_CMD=$(get_editor)
 
-mkdir -p "$JOURNAL_DIR/entries"
-cd "$JOURNAL_DIR" || error_exit "Cannot access journal directory: $JOURNAL_DIR"
+# Create journal directory if it doesn't exist
+if [ ! -d "$JOURNAL_DIR" ]; then
+    if ! mkdir -p "$JOURNAL_DIR/entries" 2>/dev/null; then
+        error_exit "Cannot create journal directory: $JOURNAL_DIR\n\nCheck that you have write permissions to the parent directory.\nYou can also set a custom location with:\n  export JOURNAL_DIR=\"/path/to/your/journal\""
+    fi
+else
+    mkdir -p "$JOURNAL_DIR/entries"
+fi
+
+cd "$JOURNAL_DIR" || error_exit "Cannot access journal directory: $JOURNAL_DIR\n\nCheck that the directory exists and you have permissions to access it."
 
 # Initialize or check git repo
 USE_GIT=true
