@@ -6,8 +6,6 @@
 ![Version](https://img.shields.io/badge/version-4.7-blue.svg)
 ![GitHub stars](https://img.shields.io/github/stars/jtaylortech/journalot?style=social)
 
-**Website**: [journalot.dev](https://journalot.dev)
-
 **Minimal journaling CLI for developers. Just type `journal` in your terminal and start writing.**
 
 `journalot` is a CLI tool for maintaining a daily markdown journal with Git-based version control. It's designed to be lightweight and easy to use, promoting mindfulness and reflection.
@@ -15,6 +13,8 @@
 **✨ New in v4.7:** Improved error messages with actionable instructions! Plus list sort control with `--oldest-first` flag, natural language dates, enhanced search, backup/restore, and customizable prompts. 
 
 You can also search past entries by keyword or date using command-line tools like grep or fzf. For example, grep "confidence" or "new idea" ~/journalot/entries/*.md
+
+**Website**: [journalot.dev](https://journalot.dev)
 
 ## Features
 
