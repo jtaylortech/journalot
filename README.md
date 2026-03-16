@@ -5,6 +5,7 @@
 ![Bash](https://img.shields.io/badge/bash-4.0+-green.svg)
 ![Version](https://img.shields.io/badge/version-4.7-blue.svg)
 ![GitHub stars](https://img.shields.io/github/stars/jtaylortech/journalot?style=social)
+**Website**: [journalot.dev](https://journalot.dev)
 
 **Minimal journaling CLI for developers. Just type `journal` in your terminal and start writing.**
 
