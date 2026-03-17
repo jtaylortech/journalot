@@ -3,14 +3,14 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Bash](https://img.shields.io/badge/bash-4.0+-green.svg)
-![Version](https://img.shields.io/badge/version-5.0-blue.svg)
+![Version](https://img.shields.io/badge/version-5.1-blue.svg)
 ![GitHub stars](https://img.shields.io/github/stars/jtaylortech/journalot?style=social)
 
 **Minimal journaling CLI for developers. Just type `journal` in your terminal and start writing.**
 
 `journalot` is a CLI tool for maintaining a daily markdown journal with Git-based version control. It's designed to be lightweight and easy to use, promoting mindfulness and reflection.
 
-**✨ New in v5.0:** Multiple journal support — keep work, personal, and any other journals completely separate with `journal --switch work`. Each journal has its own directory and git repo. Can be disabled with `MULTI_JOURNAL=false`.
+**✨ New in v5.1:** Shared journals — mark any journal as shared with `--shared` for automatic conflict detection, loud sync, and a built-in conflict resolution helper. Perfect for journaling with a partner. Plus multi-journal support from v5.0.
 
 You can also search past entries by keyword or date using command-line tools like grep or fzf. For example, grep "confidence" or "new idea" ~/journalot/entries/*.md
 
@@ -140,11 +140,12 @@ journal --help                       # Show help
 
 ### Multiple Journals
 ```bash
-journal --switch work            # Switch to (or create) 'work' journal
-journal --switch personal        # Switch to (or create) 'personal' journal
-journal --switch default         # Return to your default journal
-journal --list-journals          # List all journals, shows active
-journal --new-journal work       # Explicitly create a new journal
+journal --switch work             # Switch to (or create) 'work' journal
+journal --switch personal         # Switch to (or create) 'personal' journal
+journal --switch kids --shared    # Switch to 'kids' and mark it as shared
+journal --switch default          # Return to your default journal
+journal --list-journals           # List all journals, shows active
+journal --new-journal work        # Explicitly create a new journal
 ```
 
 Each named journal stores entries at `~/journalot/journals/NAME/entries/` and maintains its own independent git repo. Your default journal at `~/journalot/` is unchanged.
@@ -153,6 +154,36 @@ To disable multi-journal support entirely, add to `~/.config/journalot/config`:
 ```bash
 MULTI_JOURNAL=false
 ```
+
+### Shared Journals
+
+Shared journals are designed for two (or more) people writing to the same journal — synced via a private git repo.
+
+```bash
+journal --switch kids --shared    # Mark 'kids' journal as shared
+```
+
+When a journal is marked as shared, `journal` will:
+- **Pull loudly on open** — shows sync status so you know you're up to date
+- **Detect conflicts** — if someone else wrote to today's entry, you're warned before opening
+- **Auto-commit and push** — no prompts after saving, changes go straight to remote
+- **Built-in conflict resolution** — if push fails, choose to merge, edit manually, or skip
+
+**Setup for two people:**
+```bash
+# Person 1 — create and push the shared journal
+journal --switch kids --shared
+cd ~/journalot/journals/kids
+git remote add origin git@github.com:you/kids-journal-private.git
+git push -u origin main
+
+# Person 2 — clone into the same location
+mkdir -p ~/journalot/journals
+git clone git@github.com:you/kids-journal-private.git ~/journalot/journals/kids
+journal --switch kids --shared
+```
+
+Both people run `journal` and everything syncs automatically.
 
 ### Search & Discovery
 ```bash

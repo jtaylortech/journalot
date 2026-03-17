@@ -5,6 +5,17 @@ All notable changes to journalot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.0] - 2026-03-16
+
+### Added
+- **Shared journal support** — first-class collaborative journaling via `--shared` flag:
+  - `journal --switch kids --shared` — mark a journal as shared
+  - Shared journals pull loudly on open, showing sync status clearly
+  - Conflict detection before opening editor — warns if a collaborator wrote to today's entry
+  - Auto-commit and auto-push after every save — no prompts
+  - Built-in conflict resolution helper when push fails: merge, edit manually, or skip
+  - `.shared` marker file in journal directory signals shared status
+
 ## [5.0.0] - 2026-03-16
 
 ### Added

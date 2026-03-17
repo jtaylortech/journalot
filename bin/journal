@@ -200,6 +200,7 @@ OPTIONS:
     --backup                Create a backup of all journal entries
     --restore               Restore journal from a backup
     --switch JOURNAL        Switch active journal (e.g., work, personal)
+        --shared            Mark journal as shared (auto-syncs, conflict detection)
     --list-journals         List all journals and show active
     --new-journal NAME      Create a new named journal
 
@@ -219,6 +220,7 @@ EXAMPLES:
     journal --stats                   # View statistics
     journal --export html             # Export to HTML
     journal --switch work             # Switch to 'work' journal
+    journal --switch kids --shared    # Switch to 'kids' journal and mark as shared
     journal --switch personal         # Switch to 'personal' journal
     journal --list-journals           # List all journals
     journal --new-journal work        # Create a new journal named 'work'
@@ -679,6 +681,100 @@ get_daily_prompt() {
     echo "${prompts[$index]}"
 }
 
+# Check if current journal is marked as shared
+is_shared_journal() {
+    [ -f "$JOURNAL_DIR/.shared" ]
+}
+
+# Check remote for changes before opening editor
+check_for_remote_changes() {
+    local filename="$1"
+    local relative_path="entries/$(basename "$filename")"
+
+    git fetch origin "$GIT_BRANCH" 2>/dev/null || return 0
+
+    local remote_diff
+    remote_diff=$(git diff "HEAD..origin/$GIT_BRANCH" -- "$relative_path" 2>/dev/null)
+
+    if [ -n "$remote_diff" ]; then
+        warn_msg "Remote has changes to today's entry — someone else may have written here."
+        echo ""
+        echo -n "  Pull their changes before writing? (y/n): "
+        read -r response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
+            if git pull origin "$GIT_BRANCH" --rebase 2>/dev/null; then
+                success_msg "Pulled latest changes."
+            else
+                warn_msg "Pull failed. You may need to resolve manually."
+                echo "  Run: cd $JOURNAL_DIR && git status"
+            fi
+        fi
+        echo ""
+    fi
+}
+
+# Conflict resolution helper
+resolve_conflict() {
+    local filename="$1"
+    local relative_path="entries/$(basename "$filename")"
+
+    warn_msg "Push failed — remote has new changes."
+    echo ""
+
+    git fetch origin "$GIT_BRANCH" 2>/dev/null
+
+    local remote_diff
+    remote_diff=$(git diff "HEAD..origin/$GIT_BRANCH" -- "$relative_path" 2>/dev/null)
+
+    if [ -n "$remote_diff" ]; then
+        echo -e "${BLUE}What changed on remote:${NC}"
+        echo "$remote_diff" | head -40
+        echo ""
+    fi
+
+    echo "How do you want to handle this?"
+    echo "  1) Pull and merge (recommended)"
+    echo "  2) Open editor to resolve manually"
+    echo "  3) Skip for now (push manually later)"
+    echo ""
+    echo -n "Choose (1/2/3): "
+    read -r choice
+
+    case "$choice" in
+        1)
+            if git pull origin "$GIT_BRANCH" --rebase 2>/dev/null; then
+                if git push origin "$GIT_BRANCH"; then
+                    success_msg "✅ Merged and synced."
+                else
+                    warn_msg "Still conflicted. Run: cd $JOURNAL_DIR && git status"
+                fi
+            else
+                warn_msg "Merge conflict detected."
+                echo "  Resolve conflicts, then run:"
+                echo "    cd $JOURNAL_DIR && git rebase --continue && git push origin $GIT_BRANCH"
+            fi
+            ;;
+        2)
+            git pull origin "$GIT_BRANCH" 2>/dev/null || true
+            $EDITOR_CMD "$filename"
+            git add "$filename"
+            git commit -m "Resolve shared journal conflict for $ENTRY_DATE" 2>/dev/null || true
+            if ! git push origin "$GIT_BRANCH"; then
+                warn_msg "Push still failed. Run: cd $JOURNAL_DIR && git push origin $GIT_BRANCH"
+            else
+                success_msg "✅ Conflict resolved and synced."
+            fi
+            ;;
+        3)
+            warn_msg "Skipped. Run manually when ready:"
+            echo "  cd $JOURNAL_DIR && git push origin $GIT_BRANCH"
+            ;;
+        *)
+            warn_msg "Skipped. Run: cd $JOURNAL_DIR && git push origin $GIT_BRANCH"
+            ;;
+    esac
+}
+
 # List all journals
 list_journals() {
     if [ "$MULTI_JOURNAL" != "true" ]; then
@@ -712,8 +808,10 @@ list_journals() {
 # Switch active journal
 switch_journal() {
     local name="$1"
+    local shared="$2"  # optional: "shared"
+
     if [ -z "$name" ]; then
-        error_exit "Journal name required.\n\nUsage: journal --switch NAME"
+        error_exit "Journal name required.\n\nUsage: journal --switch NAME [--shared]"
     fi
 
     if [ "$MULTI_JOURNAL" != "true" ]; then
@@ -729,6 +827,15 @@ switch_journal() {
 
     mkdir -p "$target_dir/entries"
 
+    # Mark as shared if requested
+    if [ "$shared" = "shared" ]; then
+        touch "$target_dir/.shared"
+        success_msg "Journal '$name' marked as shared."
+        echo "  Tip: add a git remote so collaborators can sync:"
+        echo "    cd $target_dir && git remote add origin <repo-url>"
+        echo ""
+    fi
+
     # Update config: remove existing ACTIVE_JOURNAL line, then append new one
     mkdir -p "$CONFIG_DIR"
     touch "$CONFIG_FILE"
@@ -740,6 +847,9 @@ switch_journal() {
 
     success_msg "Switched to journal: $name"
     echo "  Directory: $target_dir"
+    if [ -f "$target_dir/.shared" ]; then
+        echo -e "  ${YELLOW}Shared journal${NC} — entries will auto-sync on open and save."
+    fi
 }
 
 # Create a new named journal
@@ -881,9 +991,13 @@ while [[ $# -gt 0 ]]; do
             ;;
         --switch)
             if [ -z "$2" ]; then
-                error_exit "Journal name required.\n\nUsage: journal --switch NAME"
+                error_exit "Journal name required.\n\nUsage: journal --switch NAME [--shared]"
             fi
-            switch_journal "$2"
+            if [ "$3" = "--shared" ]; then
+                switch_journal "$2" "shared"
+            else
+                switch_journal "$2"
+            fi
             exit 0
             ;;
         --list-journals)
@@ -944,10 +1058,24 @@ init_repo || USE_GIT=false
 
 # Pull latest changes if git is available
 if [ "$USE_GIT" = true ] && git remote get-url origin &> /dev/null; then
-    echo "Syncing with remote..."
-    if ! git pull origin "$GIT_BRANCH" --rebase 2>/dev/null; then
-        warn_msg "Failed to pull from remote. Continuing with local changes..."
+    if is_shared_journal; then
+        echo -e "${BLUE}Shared journal — syncing...${NC}"
+        if ! git pull origin "$GIT_BRANCH" --rebase 2>/dev/null; then
+            warn_msg "Sync failed. Continuing with local copy."
+            echo "  Run: cd $JOURNAL_DIR && git status"
+        else
+            success_msg "Up to date."
+        fi
+    else
+        if ! git pull origin "$GIT_BRANCH" --rebase 2>/dev/null; then
+            warn_msg "Failed to pull from remote. Continuing with local changes..."
+        fi
     fi
+fi
+
+# For shared journals, check if today's entry has remote changes before opening
+if [ "$USE_GIT" = true ] && is_shared_journal && git remote get-url origin &> /dev/null; then
+    check_for_remote_changes "$FILENAME"
 fi
 
 # Create entry if it doesn't exist
@@ -995,8 +1123,24 @@ if [ "$USE_GIT" = true ]; then
     if [ "$BEFORE_HASH" != "$AFTER_HASH" ]; then
         echo ""
 
+        # Shared journals always auto-commit and auto-push
+        if is_shared_journal; then
+            git add "$FILENAME"
+            git commit -m "Journal entry for $ENTRY_DATE"
+
+            if git remote get-url origin &> /dev/null; then
+                if git push origin "$GIT_BRANCH" 2>/dev/null; then
+                    success_msg "✅ Synced to shared journal."
+                else
+                    resolve_conflict "$FILENAME"
+                fi
+            else
+                success_msg "✅ Committed locally. Add a remote to sync with others:"
+                echo "  cd $JOURNAL_DIR && git remote add origin <repo-url>"
+            fi
+
         # Auto-sync if configured
-        if [ "$AUTOSYNC" = "true" ]; then
+        elif [ "$AUTOSYNC" = "true" ]; then
             git add "$FILENAME"
             git commit -m "Journal entry for $ENTRY_DATE"
 
