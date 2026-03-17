@@ -3,14 +3,14 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Bash](https://img.shields.io/badge/bash-4.0+-green.svg)
-![Version](https://img.shields.io/badge/version-4.7-blue.svg)
+![Version](https://img.shields.io/badge/version-5.0-blue.svg)
 ![GitHub stars](https://img.shields.io/github/stars/jtaylortech/journalot?style=social)
 
 **Minimal journaling CLI for developers. Just type `journal` in your terminal and start writing.**
 
 `journalot` is a CLI tool for maintaining a daily markdown journal with Git-based version control. It's designed to be lightweight and easy to use, promoting mindfulness and reflection.
 
-**✨ New in v4.7:** Improved error messages with actionable instructions! Plus list sort control with `--oldest-first` flag, natural language dates, enhanced search, backup/restore, and customizable prompts. 
+**✨ New in v5.0:** Multiple journal support — keep work, personal, and any other journals completely separate with `journal --switch work`. Each journal has its own directory and git repo. Can be disabled with `MULTI_JOURNAL=false`.
 
 You can also search past entries by keyword or date using command-line tools like grep or fzf. For example, grep "confidence" or "new idea" ~/journalot/entries/*.md
 
@@ -32,6 +32,13 @@ You can also search past entries by keyword or date using command-line tools lik
 -   **Natural language dates**: `--date "last friday"` or `--date "3 days ago"`
 -   **Previous entries**: `--yesterday` or `--date` to access any day
 -   **Backup & restore**: `--backup` and `--restore` for easy backups
+
+### Multiple Journals
+-   **Switch journals**: `journal --switch work` — keep work, personal, and other journals fully separate
+-   **List journals**: `journal --list-journals` — see all journals with active one highlighted
+-   **Create journal**: `journal --new-journal NAME` — explicitly create a named journal
+-   **Directory structure**: Each journal lives at `~/journalot/journals/NAME/` with its own `entries/` and git repo
+-   **Disable**: Set `MULTI_JOURNAL=false` in config to hide multi-journal commands entirely
 
 ### Power Features
 -   **Stats**: `--stats` shows total entries, words, and patterns (non-gamified)
@@ -131,6 +138,22 @@ journal --help                       # Show help
 - `"last monday"`, `"last friday"`, etc.
 - Standard formats like `2025-01-15`
 
+### Multiple Journals
+```bash
+journal --switch work            # Switch to (or create) 'work' journal
+journal --switch personal        # Switch to (or create) 'personal' journal
+journal --switch default         # Return to your default journal
+journal --list-journals          # List all journals, shows active
+journal --new-journal work       # Explicitly create a new journal
+```
+
+Each named journal stores entries at `~/journalot/journals/NAME/entries/` and maintains its own independent git repo. Your default journal at `~/journalot/` is unchanged.
+
+To disable multi-journal support entirely, add to `~/.config/journalot/config`:
+```bash
+MULTI_JOURNAL=false
+```
+
 ### Search & Discovery
 ```bash
 journal --search "confidence"        # Search with context and highlighting
@@ -182,6 +205,9 @@ GIT_BRANCH=master
 
 # Custom journal directory (optional)
 # JOURNAL_DIR="$HOME/my-journal"
+
+# Disable multi-journal support (enabled by default)
+# MULTI_JOURNAL=false
 ```
 
 **Note**: Old config files at `~/.journalotrc` will be automatically migrated to the XDG location on first run.

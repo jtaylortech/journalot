@@ -22,6 +22,17 @@ if [ -f "$CONFIG_FILE" ]; then
     source "$CONFIG_FILE"
 fi
 
+# Store base journal dir before applying active journal
+BASE_JOURNAL_DIR="$JOURNAL_DIR"
+
+# Multi-journal support (set MULTI_JOURNAL=false in config to disable)
+MULTI_JOURNAL="${MULTI_JOURNAL:-true}"
+
+# Apply active journal to JOURNAL_DIR
+if [ "$MULTI_JOURNAL" = "true" ] && [ -n "$ACTIVE_JOURNAL" ] && [ "$ACTIVE_JOURNAL" != "default" ]; then
+    JOURNAL_DIR="$BASE_JOURNAL_DIR/journals/$ACTIVE_JOURNAL"
+fi
+
 # Default git branch (can be overridden in config)
 GIT_BRANCH="${GIT_BRANCH:-main}"
 
@@ -188,6 +199,9 @@ OPTIONS:
     --prompt                Show today's writing prompt
     --backup                Create a backup of all journal entries
     --restore               Restore journal from a backup
+    --switch JOURNAL        Switch active journal (e.g., work, personal)
+    --list-journals         List all journals and show active
+    --new-journal NAME      Create a new named journal
 
 EXAMPLES:
     journal                                # Open today's journal
@@ -204,6 +218,10 @@ EXAMPLES:
     journal --tag work                # Filter by tag
     journal --stats                   # View statistics
     journal --export html             # Export to HTML
+    journal --switch work             # Switch to 'work' journal
+    journal --switch personal         # Switch to 'personal' journal
+    journal --list-journals           # List all journals
+    journal --new-journal work        # Create a new journal named 'work'
 
 CONFIGURATION:
     Journal directory: $JOURNAL_DIR
@@ -214,6 +232,7 @@ CONFIGURATION:
       AUTOSYNC=true              # Skip commit/push prompts
       DISABLE_PROMPTS=true       # Disable daily writing prompts
       GIT_BRANCH=main            # Git branch name (default: main)
+      MULTI_JOURNAL=false        # Disable multi-journal support
 EOF
 }
 
@@ -660,6 +679,99 @@ get_daily_prompt() {
     echo "${prompts[$index]}"
 }
 
+# List all journals
+list_journals() {
+    if [ "$MULTI_JOURNAL" != "true" ]; then
+        error_exit "Multi-journal support is disabled.\n\nTo enable it, add to $CONFIG_FILE:\n  MULTI_JOURNAL=true"
+    fi
+
+    echo -e "${BLUE}Your journals:${NC}\n"
+
+    local current="${ACTIVE_JOURNAL:-default}"
+
+    if [ "$current" = "default" ]; then
+        echo -e "  ${GREEN}* default${NC}  (active)"
+    else
+        echo "    default"
+    fi
+
+    if [ -d "$BASE_JOURNAL_DIR/journals" ]; then
+        for dir in "$BASE_JOURNAL_DIR/journals"/*/; do
+            [ -d "$dir" ] || continue
+            local name
+            name=$(basename "$dir")
+            if [ "$name" = "$current" ]; then
+                echo -e "  ${GREEN}* $name${NC}  (active)"
+            else
+                echo "    $name"
+            fi
+        done
+    fi
+}
+
+# Switch active journal
+switch_journal() {
+    local name="$1"
+    if [ -z "$name" ]; then
+        error_exit "Journal name required.\n\nUsage: journal --switch NAME"
+    fi
+
+    if [ "$MULTI_JOURNAL" != "true" ]; then
+        error_exit "Multi-journal support is disabled.\n\nTo enable it, add to $CONFIG_FILE:\n  MULTI_JOURNAL=true"
+    fi
+
+    local target_dir
+    if [ "$name" = "default" ]; then
+        target_dir="$BASE_JOURNAL_DIR"
+    else
+        target_dir="$BASE_JOURNAL_DIR/journals/$name"
+    fi
+
+    mkdir -p "$target_dir/entries"
+
+    # Update config: remove existing ACTIVE_JOURNAL line, then append new one
+    mkdir -p "$CONFIG_DIR"
+    touch "$CONFIG_FILE"
+    sed -i.bak '/^ACTIVE_JOURNAL=/d' "$CONFIG_FILE" && rm -f "${CONFIG_FILE}.bak"
+
+    if [ "$name" != "default" ]; then
+        echo "ACTIVE_JOURNAL=$name" >> "$CONFIG_FILE"
+    fi
+
+    success_msg "Switched to journal: $name"
+    echo "  Directory: $target_dir"
+}
+
+# Create a new named journal
+new_journal() {
+    local name="$1"
+    if [ -z "$name" ]; then
+        error_exit "Journal name required.\n\nUsage: journal --new-journal NAME"
+    fi
+
+    if [ "$MULTI_JOURNAL" != "true" ]; then
+        error_exit "Multi-journal support is disabled.\n\nTo enable it, add to $CONFIG_FILE:\n  MULTI_JOURNAL=true"
+    fi
+
+    if [ "$name" = "default" ]; then
+        error_exit "'default' is reserved. Use 'journal --switch default' to return to the default journal."
+    fi
+
+    local target_dir="$BASE_JOURNAL_DIR/journals/$name"
+
+    if [ -d "$target_dir" ]; then
+        warn_msg "Journal '$name' already exists at $target_dir"
+        echo "  Switch to it with: journal --switch $name"
+        return
+    fi
+
+    mkdir -p "$target_dir/entries"
+    success_msg "Created journal: $name"
+    echo "  Directory: $target_dir"
+    echo ""
+    echo "  Switch to it with: journal --switch $name"
+}
+
 # Parse arguments
 ENTRY_DATE=$(date '+%Y-%m-%d')
 USE_TIMESTAMP=false
@@ -765,6 +877,24 @@ while [[ $# -gt 0 ]]; do
             ;;
         --restore)
             restore_journal
+            exit 0
+            ;;
+        --switch)
+            if [ -z "$2" ]; then
+                error_exit "Journal name required.\n\nUsage: journal --switch NAME"
+            fi
+            switch_journal "$2"
+            exit 0
+            ;;
+        --list-journals)
+            list_journals
+            exit 0
+            ;;
+        --new-journal)
+            if [ -z "$2" ]; then
+                error_exit "Journal name required.\n\nUsage: journal --new-journal NAME"
+            fi
+            new_journal "$2"
             exit 0
             ;;
         -*)

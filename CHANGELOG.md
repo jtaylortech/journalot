@@ -5,6 +5,19 @@ All notable changes to journalot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.0] - 2026-03-16
+
+### Added
+- **Multiple journal support** - Keep work, personal, and any other journals completely separate:
+  - `journal --switch NAME` — switch to a named journal (creates it if it doesn't exist)
+  - `journal --switch default` — return to your default journal
+  - `journal --list-journals` — list all journals with active one highlighted
+  - `journal --new-journal NAME` — explicitly create a new named journal
+  - Each journal lives at `~/journalot/journals/NAME/` with its own `entries/` and git repo
+  - Active journal persists across sessions via `ACTIVE_JOURNAL` in config
+  - Set `MULTI_JOURNAL=false` in config to disable the feature entirely
+  - Fully backwards compatible — default journal at `~/journalot/` is unchanged
+
 ## [Unreleased]
 
 ### Changed
@@ -75,7 +88,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned for v5.0
-- Multiple journal support (work, personal, etc.)
+### Planned
 - Git conflict resolution helper
-- Additional archive and organization features
