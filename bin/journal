@@ -197,6 +197,7 @@ OPTIONS:
     --diff DATE             Show git diff for an entry
     --archive YEAR          Archive entries from a year
     --prompt                Show today's writing prompt
+    --calendar [YYYY-MM]    Show monthly calendar with entry indicators
     --backup                Create a backup of all journal entries
     --restore               Restore journal from a backup
     --switch JOURNAL        Switch active journal (e.g., work, personal)
@@ -218,6 +219,8 @@ EXAMPLES:
     journal --week                    # Open this week's entries
     journal --tag work                # Filter by tag
     journal --stats                   # View statistics
+    journal --calendar                # Show this month's calendar
+    journal --calendar 2026-01        # Show calendar for January 2026
     journal --export html             # Export to HTML
     journal --switch work             # Switch to 'work' journal
     journal --switch kids --shared    # Switch to 'kids' journal and mark as shared
@@ -775,6 +778,103 @@ resolve_conflict() {
     esac
 }
 
+# Show ASCII calendar with entry indicators
+show_calendar() {
+    local input="${1:-}"
+    local year month month_padded
+
+    if [ -n "$input" ]; then
+        year="${input%%-*}"
+        month_padded="${input##*-}"
+        month=$((10#$month_padded))
+    else
+        year=$(date '+%Y')
+        month_padded=$(date '+%m')
+        month=$((10#$month_padded))
+    fi
+
+    printf -v month_padded "%02d" "$month"
+
+    # Month name
+    local month_name
+    month_name=$(date -j -f "%Y-%m-%d" "${year}-${month_padded}-01" "+%B" 2>/dev/null || \
+                 date -d "${year}-${month_padded}-01" "+%B" 2>/dev/null || \
+                 echo "Unknown")
+
+    # First day of week for the 1st (1=Mon, 7=Sun)
+    local first_dow
+    first_dow=$(date -j -f "%Y-%m-%d" "${year}-${month_padded}-01" "+%u" 2>/dev/null || \
+                date -d "${year}-${month_padded}-01" "+%u" 2>/dev/null || \
+                echo "1")
+
+    # Days in month
+    local next_month next_year next_month_padded days_in_month
+    next_month=$(( (month % 12) + 1 ))
+    next_year=$year
+    [ "$month" -eq 12 ] && next_year=$(( year + 1 ))
+    printf -v next_month_padded "%02d" "$next_month"
+
+    days_in_month=$(date -j -f "%Y-%m-%d" "${next_year}-${next_month_padded}-01" -v-1d "+%d" 2>/dev/null || \
+                    date -d "${next_year}-${next_month_padded}-01 - 1 day" "+%d" 2>/dev/null || \
+                    echo "30")
+
+    local today_str
+    today_str=$(date '+%Y-%m-%d')
+
+    # Header
+    local title="$month_name $year"
+    local pad=$(( (20 - ${#title}) / 2 ))
+    printf "\n"
+    printf "%${pad}s%s\n" "" "$title"
+    printf " Mo Tu We Th Fr Sa Su\n"
+
+    # Pad to first day of week
+    local col=$(( first_dow - 1 ))
+    local i=0
+    while [ $i -lt $col ]; do
+        printf "   "
+        i=$(( i + 1 ))
+    done
+
+    local current_col=$col
+    local day=1
+
+    while [ "$day" -le "$days_in_month" ]; do
+        local day_padded
+        printf -v day_padded "%02d" "$day"
+        local entry_date="${year}-${month_padded}-${day_padded}"
+        local entry_file="$JOURNAL_DIR/entries/${entry_date}.md"
+
+        local is_today=false
+        [ "$entry_date" = "$today_str" ] && is_today=true
+
+        local has_entry=false
+        [ -f "$entry_file" ] && has_entry=true
+
+        if $is_today && $has_entry; then
+            printf " ${GREEN}%2d${NC}" "$day"
+        elif $is_today; then
+            printf " ${YELLOW}%2d${NC}" "$day"
+        elif $has_entry; then
+            printf " ${BLUE}%2d${NC}" "$day"
+        else
+            printf " %2d" "$day"
+        fi
+
+        current_col=$(( current_col + 1 ))
+        if [ "$current_col" -eq 7 ]; then
+            printf "\n"
+            current_col=0
+        fi
+
+        day=$(( day + 1 ))
+    done
+
+    [ "$current_col" -ne 0 ] && printf "\n"
+    printf "\n"
+    printf "  ${GREEN}██${NC} today + entry   ${BLUE}██${NC} entry   ${YELLOW}██${NC} today\n\n"
+}
+
 # List all journals
 list_journals() {
     if [ "$MULTI_JOURNAL" != "true" ]; then
@@ -987,6 +1087,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         --restore)
             restore_journal
+            exit 0
+            ;;
+        --calendar)
+            if [[ "$2" =~ ^[0-9]{4}-[0-9]{2}$ ]]; then
+                show_calendar "$2"
+            else
+                show_calendar ""
+            fi
             exit 0
             ;;
         --switch)

@@ -3,14 +3,14 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Bash](https://img.shields.io/badge/bash-4.0+-green.svg)
-![Version](https://img.shields.io/badge/version-5.1-blue.svg)
+![Version](https://img.shields.io/badge/version-5.2-blue.svg)
 ![GitHub stars](https://img.shields.io/github/stars/jtaylortech/journalot?style=social)
 
 **Minimal journaling CLI for developers. Just type `journal` in your terminal and start writing.**
 
 `journalot` is a CLI tool for maintaining a daily markdown journal with Git-based version control. It's designed to be lightweight and easy to use, promoting mindfulness and reflection.
 
-**✨ New in v5.1:** Shared journals — mark any journal as shared with `--shared` for automatic conflict detection, loud sync, and a built-in conflict resolution helper. Perfect for journaling with a partner. Plus multi-journal support from v5.0.
+**✨ New in v5.2:** Calendar view — `journal --calendar` shows the current month as an ASCII calendar with dots on days you wrote. Navigate any month with `--calendar 2026-01`.
 
 You can also search past entries by keyword or date using command-line tools like grep or fzf. For example, grep "confidence" or "new idea" ~/journalot/entries/*.md
 
@@ -41,6 +41,7 @@ You can also search past entries by keyword or date using command-line tools lik
 -   **Disable**: Set `MULTI_JOURNAL=false` in config to hide multi-journal commands entirely
 
 ### Power Features
+-   **Calendar view**: `--calendar` shows the current month with entry indicators — green for days you wrote, yellow for today
 -   **Stats**: `--stats` shows total entries, words, and patterns (non-gamified)
 -   **Enhanced search**: `--search "keyword"` with context lines and highlighting
 -   **Week view**: `--week` opens all entries from current week
@@ -184,6 +185,14 @@ journal --switch kids --shared
 ```
 
 Both people run `journal` and everything syncs automatically.
+
+### Calendar
+```bash
+journal --calendar                   # Show this month's calendar
+journal --calendar 2026-01           # Show calendar for January 2026
+```
+
+Days with entries are highlighted in blue. Today is yellow. Today with an entry is green.
 
 ### Search & Discovery
 ```bash
