@@ -6,6 +6,8 @@
 ![Version](https://img.shields.io/badge/version-5.2-blue.svg)
 ![GitHub stars](https://img.shields.io/github/stars/jtaylortech/journalot?style=social)
 
+![journalot demo](https://github.com/user-attachments/assets/d3f631ad-d1e0-4ad2-8a34-12b92c53c8a6)
+
 **Minimal journaling CLI for developers. Just type `journal` in your terminal and start writing.**
 
 `journalot` is a CLI tool for maintaining a daily markdown journal with Git-based version control. It's designed to be lightweight and easy to use, promoting mindfulness and reflection.
