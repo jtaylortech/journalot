@@ -10,51 +10,7 @@
 
 **Minimal journaling CLI for developers. Just type `journal` in your terminal and start writing.**
 
-`journalot` is a CLI tool for maintaining a daily markdown journal with Git-based version control. It's designed to be lightweight and easy to use, promoting mindfulness and reflection.
-
-**✨ New in v5.2:** Calendar view — `journal --calendar` shows the current month as an ASCII calendar with dots on days you wrote. Navigate any month with `--calendar 2026-01`.
-
-You can also search past entries by keyword or date using command-line tools like grep or fzf. For example, grep "confidence" or "new idea" ~/journalot/entries/*.md
-
 **Website**: [journalot.dev](https://journalot.dev)
-
-## Features
-
-### Core Features
--   Creates a daily journal file: `YYYY-MM-DD.md` stored in `entries/` folder
--   Smart editor detection (respects `$EDITOR` or falls back to code → vim → nano)
--   Optional Git integration with auto-commit and push
--   Template support for customized entry structure
--   XDG-compliant config file (`~/.config/journalot/config`)
-
-### Quick Wins
--   **Quick capture**: `journal "Had a great idea"` - append to today's entry without opening editor
--   **Enhanced list view**: Word count and preview for each entry (newest first, or use `--oldest-first`)
--   **Auto-sync**: Set `AUTOSYNC=true` in config to skip commit/push prompts
--   **Natural language dates**: `--date "last friday"` or `--date "3 days ago"`
--   **Previous entries**: `--yesterday` or `--date` to access any day
--   **Backup & restore**: `--backup` and `--restore` for easy backups
-
-### Multiple Journals
--   **Switch journals**: `journal --switch work` — keep work, personal, and other journals fully separate
--   **List journals**: `journal --list-journals` — see all journals with active one highlighted
--   **Create journal**: `journal --new-journal NAME` — explicitly create a named journal
--   **Directory structure**: Each journal lives at `~/journalot/journals/NAME/` with its own `entries/` and git repo
--   **Disable**: Set `MULTI_JOURNAL=false` in config to hide multi-journal commands entirely
-
-### Power Features
--   **Calendar view**: `--calendar` shows the current month with entry indicators — green for days you wrote, yellow for today
--   **Stats**: `--stats` shows total entries, words, and patterns (non-gamified)
--   **Enhanced search**: `--search "keyword"` with context lines and highlighting
--   **Week view**: `--week` opens all entries from current week
--   **Timestamps**: `--time` creates multiple entries per day (e.g., `2025-01-15-1430.md`)
--   **Tags**: Filter entries by hashtag with `--tag work`
--   **Export**: `--export html` or `--export pdf` to share or archive
--   **Random entry**: `--random` rediscover old thoughts
--   **Diff view**: `--diff DATE` see what changed in an entry
--   **Archive**: `--archive YEAR` move old years to archive folder
--   **Customizable prompts**: Daily writing prompts (custom + day-of-week specific)
-
 
 ## Why journalot?
 
@@ -77,7 +33,7 @@ brew tap jtaylortech/journalot
 brew install journalot
 ```
 
-### Manual Installation
+### Manual
 
 ```bash
 git clone git@github.com:jtaylortech/journalot.git
@@ -85,238 +41,95 @@ cd journalot
 sudo ./install.sh
 ```
 
-## SSH Setup (Optional)
-If you want to sync across devices, set up SSH access for GitHub. [Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
-
-## Set Up Your Own Private Journal Repo
-Your journal entries are stored in `~/journalot/` (the journal directory), NOT in the cloned `journalot` repository. To enable git-based syncing for your personal journal entries:
-
-1. Create a new private repo on GitHub (e.g., `my-private-journal`)
-2. Initialize git in your journal directory and add the remote:
-```bash
-   cd ~/journalot
-   git init
-   git remote add origin git@github.com:<your-username>/my-private-journal.git
-   git add .
-   git commit -m "Initial journal setup"
-   git push -u origin main
- ```
-
-**Note**: The branch name can be configured - see Configuration section below.
-
-## Privacy & Security
-
-Your journal entries are:
-- **Stored locally** as plain markdown files in `~/journalot/entries/`
-- **Optionally synced** to a private GitHub repository you control
-- **Encrypted in transit** when using SSH (git@github.com URLs)
-- **Protected by GitHub's access controls** if using a private repo
-
-For additional security, use:
-- Encrypted filesystem (FileVault on macOS, LUKS on Linux)
-- Private repository with restricted access
-- SSH keys with passphrase protection
-
-**Note**: Entries are stored as plain text locally and in your git repository. If you need encryption at rest, consider using full-disk encryption or an encrypted git remote.
-
 ## Usage
 
-### Basic Usage
 ```bash
 journal                              # Open today's journal
-journal "Had a breakthrough today"   # Quick capture (append without editor)
-journal --yesterday                  # Open yesterday's journal
-journal --date 2025-01-15            # Open specific date
+journal "Had a breakthrough today"   # Quick capture (no editor)
+journal --yesterday                  # Open yesterday's entry
 journal --date "last friday"         # Natural language dates
 journal --date "3 days ago"          # Relative dates
-journal --time                       # Create timestamped entry (multiple per day)
 journal --list                       # List all entries (newest first)
 journal --list --oldest-first        # List entries oldest first
-journal --help                       # Show help
+journal --calendar                   # Monthly calendar with entry indicators
+journal --calendar 2026-01           # Calendar for a specific month
+journal --search "confidence"        # Search with context and highlighting
+journal --week                       # Open all entries from this week
+journal --tag work                   # Filter entries by #tag
+journal --stats                      # Journal statistics
+journal --random                     # Show a random entry
+journal --diff 2025-01-15            # Git history for an entry
+journal --prompt                     # Show today's writing prompt
+journal --export html                # Export to HTML
+journal --export pdf                 # Export to PDF (requires pandoc)
+journal --backup                     # Create timestamped backup
+journal --restore                    # Restore from backup (interactive)
+journal --archive 2024               # Archive all 2024 entries
 ```
 
-**Natural language dates** support:
-- `"yesterday"`, `"tomorrow"`
-- `"X days ago"`, `"X weeks ago"` (e.g., `"5 days ago"`)
-- `"last monday"`, `"last friday"`, etc.
-- Standard formats like `2025-01-15`
+## Multiple Journals
 
-### Multiple Journals
 ```bash
-journal --switch work             # Switch to (or create) 'work' journal
-journal --switch personal         # Switch to (or create) 'personal' journal
-journal --switch kids --shared    # Switch to 'kids' and mark it as shared
-journal --switch default          # Return to your default journal
-journal --list-journals           # List all journals, shows active
-journal --new-journal work        # Explicitly create a new journal
+journal --switch work                # Switch to (or create) 'work' journal
+journal --switch kids --shared       # Switch to 'kids' and mark as shared
+journal --switch default             # Return to default journal
+journal --list-journals              # List all journals
+journal --new-journal work           # Explicitly create a named journal
 ```
 
-Each named journal stores entries at `~/journalot/journals/NAME/entries/` and maintains its own independent git repo. Your default journal at `~/journalot/` is unchanged.
+Each journal lives at `~/journalot/journals/NAME/` with its own `entries/` and git repo. Your default journal at `~/journalot/` is unchanged. Disable with `MULTI_JOURNAL=false`.
 
-To disable multi-journal support entirely, add to `~/.config/journalot/config`:
-```bash
-MULTI_JOURNAL=false
-```
+## Shared Journals
 
-### Shared Journals
-
-Shared journals are designed for two (or more) people writing to the same journal — synced via a private git repo.
+For two people writing to the same journal, synced via a private git repo:
 
 ```bash
-journal --switch kids --shared    # Mark 'kids' journal as shared
-```
-
-When a journal is marked as shared, `journal` will:
-- **Pull loudly on open** — shows sync status so you know you're up to date
-- **Detect conflicts** — if someone else wrote to today's entry, you're warned before opening
-- **Auto-commit and push** — no prompts after saving, changes go straight to remote
-- **Built-in conflict resolution** — if push fails, choose to merge, edit manually, or skip
-
-**Setup for two people:**
-```bash
-# Person 1 — create and push the shared journal
+# Person 1
 journal --switch kids --shared
 cd ~/journalot/journals/kids
 git remote add origin git@github.com:you/kids-journal-private.git
 git push -u origin main
 
-# Person 2 — clone into the same location
+# Person 2
 mkdir -p ~/journalot/journals
 git clone git@github.com:you/kids-journal-private.git ~/journalot/journals/kids
 journal --switch kids --shared
 ```
 
-Both people run `journal` and everything syncs automatically.
+Shared journals auto-pull on open, warn before conflicts, auto-commit and push on save, and include a conflict resolution helper if push fails.
 
-### Calendar
+## Git Sync (Private Journal)
+
 ```bash
-journal --calendar                   # Show this month's calendar
-journal --calendar 2026-01           # Show calendar for January 2026
+cd ~/journalot
+git init
+git remote add origin git@github.com:<your-username>/my-private-journal.git
+git push -u origin main
 ```
 
-Days with entries are highlighted in blue. Today is yellow. Today with an entry is green.
+[SSH setup guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
 
-### Search & Discovery
+## Configuration
+
+`~/.config/journalot/config`:
+
 ```bash
-journal --search "confidence"        # Search with context and highlighting
-journal --week                       # Open all entries from this week
-journal --tag work                   # Filter entries by #tag
-journal --stats                      # View journal statistics
-journal --random                     # Show a random entry
-journal --diff 2025-01-15            # See git history for an entry
-journal --prompt                     # Show today's writing prompt
+AUTOSYNC=true          # Skip commit/push prompts
+DISABLE_PROMPTS=true   # Disable daily writing prompts
+GIT_BRANCH=master      # Custom git branch (default: main)
+MULTI_JOURNAL=false    # Disable multi-journal support
+# JOURNAL_DIR="$HOME/my-journal"  # Custom journal directory
 ```
 
-**Enhanced search** shows 2 lines of context before/after matches with color highlighting.
+Custom entry template: `~/journalot/template.md` (supports `{{date}}` placeholder)
 
-### Backup & Restore
-```bash
-journal --backup                     # Create timestamped backup
-journal --restore                    # Restore from backup (interactive)
-```
-
-Backups are stored in `~/journalot/backups/` as compressed archives. The restore command:
-- Shows all available backups with sizes and dates
-- Creates a safety backup before restoring
-- Fully interactive with confirmation prompts
-
-### Archive & Organization
-```bash
-journal --archive 2024               # Archive all 2024 entries
-journal --archive 2024 --unarchive   # Restore from archive
-```
-
-### Export & Sharing
-```bash
-journal --export html                # Export to HTML
-journal --export pdf                 # Export to PDF (requires pandoc)
-```
-
-### Configuration
-
-Create `~/.config/journalot/config` to customize behavior:
-```bash
-# Auto-sync without prompts
-AUTOSYNC=true
-
-# Disable daily writing prompts
-DISABLE_PROMPTS=true
-
-# Custom git branch name (default: main)
-GIT_BRANCH=master
-
-# Custom journal directory (optional)
-# JOURNAL_DIR="$HOME/my-journal"
-
-# Disable multi-journal support (enabled by default)
-# MULTI_JOURNAL=false
-```
-
-**Note**: Old config files at `~/.journalotrc` will be automatically migrated to the XDG location on first run.
-
-Create `~/journalot/template.md` to customize new entries:
-```markdown
-# {{date}}
-
-## What happened today?
-
-## Grateful for
-
-## Tomorrow's focus
-```
-
-### Custom Prompts
-
-**Option 1: General custom prompts** - Create `~/journalot/prompts.md` with one prompt per line:
-```
-What am I working towards?
-What patterns am I noticing?
-What decision needs to be made?
-```
-
-**Option 2: Day-specific prompts** - Create files for specific days (e.g., `~/journalot/prompts-monday.md`):
-```bash
-~/journalot/prompts-monday.md       # Monday prompts: "What are your goals for the week?"
-~/journalot/prompts-friday.md       # Friday prompts: "What did you accomplish this week?"
-~/journalot/prompts-sunday.md       # Sunday prompts: "What are you grateful for?"
-```
-
-**Priority order**: Day-specific prompts → Custom prompts → Default prompts
-
-Each file should contain one prompt per line. Day-specific files choose a random prompt, while general prompts rotate daily.
-
-### Customization
-- **Editor**: Set `$EDITOR` environment variable (e.g., `export EDITOR=vim`)
-- **Journal Directory**: Edit `JOURNAL_DIR` in config or `bin/journal` (default: `~/journalot`)
-- **Template**: Create `~/journalot/template.md` for custom entry structure
-- **Auto-sync**: Set `AUTOSYNC=true` in `~/.config/journalot/config` to skip prompts
-
-### Tips
-- Quick capture great for fleeting thoughts: `journal "Remember to check that bug"`
-- Use natural language dates: `journal --date "last monday"` is more intuitive
-- Search shows context - perfect for finding related thoughts
-- Regular backups: Run `journal --backup` before major changes
-- Use tags for organization: add `#work`, `#personal`, `#ideas` to entries
-- Week view opens all entries in your editor at once
-- Stats are informational only - no guilt for skipping days
-- Templates support `{{date}}` placeholder
-- Custom prompts: Create day-specific prompts for Monday planning, Friday reflection, etc.
-- Archive old entries to keep your main folder clean
-- Use `--random` for serendipitous rediscovery
+Custom prompts: `~/journalot/prompts.md` (one per line) or day-specific files like `~/journalot/prompts-monday.md`
 
 ---
 
 ## Support journalot
 
-If journalot helps you stay consistent with journaling, consider supporting its development:
-
 **[💖 Sponsor on GitHub](https://github.com/sponsors/jtaylortech)** | **[Learn more](https://journalot.dev/sponsor)**
-
-Your sponsorship helps:
-- Maintain cross-platform compatibility
-- Develop new features and improvements
-- Provide timely bug fixes and support
-- Keep the project free and open-source forever
 
 ### Current Sponsors
 
@@ -327,4 +140,5 @@ _Thank you to all sponsors! Your support makes journalot possible._
 ---
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+MIT — see [LICENSE](LICENSE)
