@@ -5,6 +5,11 @@ All notable changes to journalot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.1] - 2026-03-16
+
+### Fixed
+- Calendar rendering on macOS — replaced fragile `date -d` chain with pure bash leap-year math for `days_in_month`. Zero external dependencies, works on all platforms.
+
 ## [5.2.0] - 2026-03-16
 
 ### Added
@@ -39,14 +44,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Set `MULTI_JOURNAL=false` in config to disable the feature entirely
   - Fully backwards compatible — default journal at `~/journalot/` is unchanged
 
-## [Unreleased]
+## [4.7.0] - 2025-10-28
 
 ### Changed
-- **Improved error messages** - All error messages now include actionable instructions:
+- **Improved error messages** — all error messages now include actionable instructions:
   - Installation errors show exact commands to fix missing directories
   - "Not found" errors explain how to create what's missing
   - Permission errors suggest alternative solutions
-  - Maintains clean, minimal aesthetic with concise help text
 
 ## [4.6.0] - 2025-10-24
 
@@ -107,7 +111,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Clarified documentation distinguishing journal directory from cloned repo
 - Added privacy & security documentation
 
-## [Unreleased]
-
-### Planned
-- Git conflict resolution helper
