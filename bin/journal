@@ -191,6 +191,7 @@ OPTIONS:
     -l, --list              List all journal entries with previews (newest first)
         --oldest-first      List entries oldest first (use with --list)
     -y, --yesterday         Open yesterday's entry
+        --last              Open the most recent journal entry
     -d, --date DATE         Open entry for specific date (YYYY-MM-DD)
     -t, --time              Create timestamped entry (multiple per day)
     -s, --search QUERY      Search entries for keyword
@@ -216,6 +217,7 @@ EXAMPLES:
     journal --list                         # List entries (newest first)
     journal --list --oldest-first          # List entries (oldest first)
     journal --yesterday                    # Open yesterday's journal
+    journal --last                    # Open most recent entry
     journal --date 2025-01-15         # Open specific date
     journal --date "last friday"      # Natural language dates
     journal --date "3 days ago"       # Relative dates
@@ -1057,6 +1059,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         -y|--yesterday)
             ENTRY_DATE=$(date -v-1d '+%Y-%m-%d' 2>/dev/null || date -d 'yesterday' '+%Y-%m-%d' 2>/dev/null)
+            shift
+            ;;
+        --last)
+            if [ ! -d "$JOURNAL_DIR/entries" ]; then
+                error_exit "No journal entries found\n\nTo create your first entry, run:\n  journal"
+            fi
+            ENTRY_DATE=$(find "$JOURNAL_DIR/entries" -name "????-??-??.md" -type f | sort | tail -1 | sed 's|.*/||; s/\.md$//')
+            [ -z "$ENTRY_DATE" ] && error_exit "No journal entries found\n\nTo create your first entry, run:\n  journal"
             shift
             ;;
         -d|--date)
