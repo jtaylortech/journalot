@@ -3,7 +3,7 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Bash](https://img.shields.io/badge/bash-4.0+-green.svg)
-![Version](https://img.shields.io/badge/version-5.5.0-blue.svg)
+![Version](https://img.shields.io/badge/version-5.6.0-blue.svg)
 ![GitHub stars](https://img.shields.io/github/stars/jtaylortech/journalot?style=social)
 
 ![journalot demo](https://github.com/user-attachments/assets/d3f631ad-d1e0-4ad2-8a34-12b92c53c8a6)
@@ -122,7 +122,7 @@ MULTI_JOURNAL=false    # Disable multi-journal support
 # JOURNAL_DIR="$HOME/my-journal"  # Custom journal directory
 ```
 
-Custom entry template: `~/journalot/template.md` (supports `{{date}}` placeholder)
+Custom entry template: `~/journalot/template.md` (supports `{{date}}`, `{{day_of_week}}`, `{{week_number}}`, `{{time}}` placeholders)
 
 Custom prompts: `~/journalot/prompts.md` (one per line) or day-specific files like `~/journalot/prompts-monday.md`
 
