@@ -41,26 +41,34 @@ cd journalot
 sudo ./install.sh
 ```
 
+**Optional:** Install [fzf](https://github.com/junegunn/fzf) for interactive fuzzy-search in `--list`.
+
 ## Usage
 
 ```bash
+# — Everyday —
 journal                              # Open today's journal
 journal "Had a breakthrough today"   # Quick capture (no editor)
 journal --yesterday                  # Open yesterday's entry
 journal --last                       # Open most recent entry
-journal --date "last friday"         # Natural language dates
-journal --date "3 days ago"          # Relative dates
-journal --list                       # List all entries (newest first)
-journal --list --oldest-first        # List entries oldest first
+journal --date "last friday"         # Natural language dates ("3 days ago", "last monday")
+
+# — Browse & Search —
+journal --list                       # List entries (fzf interactive if installed)
+journal --list --oldest-first        # Oldest first
 journal --calendar                   # Monthly calendar with entry indicators
-journal --calendar 2026-01           # Calendar for a specific month
-journal --search "confidence"        # Search with context and highlighting
+journal --calendar 2026-01           # Specific month
+journal --search "confidence"        # Full-text search with context and highlighting
 journal --week                       # Open all entries from this week
 journal --tag work                   # Filter entries by #tag
-journal --stats                      # Journal statistics
-journal --random                     # Show a random entry
+journal --random                     # Show a random past entry
+
+# — Stats & History —
+journal --stats                      # Statistics + current/longest streak
 journal --diff 2025-01-15            # Git history for an entry
-journal --prompt                     # Show today's writing prompt
+journal --prompt                     # Today's writing prompt
+
+# — Export & Backup —
 journal --export html                # Export to HTML
 journal --export pdf                 # Export to PDF (requires pandoc)
 journal --backup                     # Create timestamped backup
