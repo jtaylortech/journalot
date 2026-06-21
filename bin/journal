@@ -255,37 +255,45 @@ list_entries() {
         error_exit "No entries directory found at $JOURNAL_DIR/entries\n\nTo create your first entry, run:\n  journal"
     fi
 
-    echo -e "${BLUE}Journal entries:${NC}\n"
-
+    local files
     if [ "$sort_order" = "oldest-first" ]; then
-        find "$JOURNAL_DIR/entries" -name "*.md" -type f | sort | while read -r file; do
-            local filename=$(basename "$file")
-            local wordcount=$(wc -w < "$file" | tr -d ' ')
-            local preview=$(head -2 "$file" | tail -1 | cut -c1-60)
-
-            if [ -z "$preview" ]; then
-                preview="(empty)"
-            fi
-
-            printf "  %s " "$filename"
-            printf "${YELLOW}(%s words)${NC}\n" "$wordcount"
-            printf "    %s\n\n" "$preview"
-        done
+        files=$(find "$JOURNAL_DIR/entries" -name "*.md" -type f | sort)
     else
-        find "$JOURNAL_DIR/entries" -name "*.md" -type f | sort -r | while read -r file; do
-            local filename=$(basename "$file")
-            local wordcount=$(wc -w < "$file" | tr -d ' ')
-            local preview=$(head -2 "$file" | tail -1 | cut -c1-60)
-
-            if [ -z "$preview" ]; then
-                preview="(empty)"
-            fi
-
-            printf "  %s " "$filename"
-            printf "${YELLOW}(%s words)${NC}\n" "$wordcount"
-            printf "    %s\n\n" "$preview"
-        done
+        files=$(find "$JOURNAL_DIR/entries" -name "*.md" -type f | sort -r)
     fi
+
+    if [ -z "$files" ]; then
+        warn_msg "No journal entries found"
+        return
+    fi
+
+    # Interactive fuzzy-find when fzf is available
+    if command -v fzf &>/dev/null; then
+        local selected
+        selected=$(echo "$files" | fzf \
+            --preview 'cat {}' \
+            --preview-window=right:65%:wrap \
+            --prompt="journal > " \
+            --header="Enter to open · Esc to quit")
+        if [ -n "$selected" ]; then
+            local editor_cmd
+            editor_cmd=$(get_editor)
+            $editor_cmd "$selected"
+        fi
+        return
+    fi
+
+    echo -e "${BLUE}Journal entries:${NC}\n"
+    echo "$files" | while read -r file; do
+        local filename wordcount preview
+        filename=$(basename "$file")
+        wordcount=$(wc -w < "$file" | tr -d ' ')
+        preview=$(head -2 "$file" | tail -1 | cut -c1-60)
+        [ -z "$preview" ] && preview="(empty)"
+        printf "  %s " "$filename"
+        printf "${YELLOW}(%s words)${NC}\n" "$wordcount"
+        printf "    %s\n\n" "$preview"
+    done
 }
 
 # Search entries
