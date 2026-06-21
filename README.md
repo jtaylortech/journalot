@@ -3,7 +3,7 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Bash](https://img.shields.io/badge/bash-4.0+-green.svg)
-![Version](https://img.shields.io/badge/version-5.3.0-blue.svg)
+![Version](https://img.shields.io/badge/version-5.4.0-blue.svg)
 ![GitHub stars](https://img.shields.io/github/stars/jtaylortech/journalot?style=social)
 
 ![journalot demo](https://github.com/user-attachments/assets/d3f631ad-d1e0-4ad2-8a34-12b92c53c8a6)
@@ -47,6 +47,7 @@ sudo ./install.sh
 journal                              # Open today's journal
 journal "Had a breakthrough today"   # Quick capture (no editor)
 journal --yesterday                  # Open yesterday's entry
+journal --last                       # Open most recent entry
 journal --date "last friday"         # Natural language dates
 journal --date "3 days ago"          # Relative dates
 journal --list                       # List all entries (newest first)
