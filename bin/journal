@@ -1255,8 +1255,15 @@ if [ ! -f "$FILENAME" ]; then
     # Check for template
     if [ -f "$JOURNAL_DIR/template.md" ]; then
         cat "$JOURNAL_DIR/template.md" > "$FILENAME"
-        # Replace {{date}} placeholder if it exists
-        sed -i.bak "s/{{date}}/$ENTRY_DATE/g" "$FILENAME" && rm "${FILENAME}.bak"
+        DAY_OF_WEEK=$(date '+%A')
+        WEEK_NUMBER=$(date '+%V')
+        ENTRY_TIME=$(date '+%H:%M')
+        sed -i.bak \
+            -e "s/{{date}}/$ENTRY_DATE/g" \
+            -e "s/{{day_of_week}}/$DAY_OF_WEEK/g" \
+            -e "s/{{week_number}}/$WEEK_NUMBER/g" \
+            -e "s/{{time}}/$ENTRY_TIME/g" \
+            "$FILENAME" && rm "${FILENAME}.bak"
     else
         echo "# $ENTRY_DATE" > "$FILENAME"
         echo "" >> "$FILENAME"

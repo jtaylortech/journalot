@@ -5,6 +5,11 @@ All notable changes to journalot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.6.0] - 2026-06-21
+
+### Added
+- **Richer template variables** — `template.md` now supports `{{day_of_week}}` (e.g. Saturday), `{{week_number}}` (ISO week, e.g. 25), and `{{time}}` (HH:MM), in addition to the existing `{{date}}`.
+
 ## [5.5.0] - 2026-06-21
 
 ### Added
