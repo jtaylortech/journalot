@@ -66,6 +66,11 @@ warn_msg() {
     echo -e "${YELLOW}$1${NC}"
 }
 
+# Convert YYYY-MM-DD to epoch seconds (cross-platform)
+date_to_epoch() {
+    date -j -f "%Y-%m-%d" "$1" "+%s" 2>/dev/null || date -d "$1" "+%s" 2>/dev/null
+}
+
 # Check dependencies
 check_dependencies() {
     if ! command -v git &> /dev/null; then
@@ -329,6 +334,44 @@ show_stats() {
     if [ "$total_entries" -gt 0 ]; then
         local avg_words=$((total_words / total_entries))
         echo "  Average words per entry: $avg_words"
+    fi
+
+    # Streak calculation (dated entries only, not timestamped)
+    local entry_dates=()
+    while IFS= read -r f; do
+        entry_dates+=("$(basename "$f" .md)")
+    done < <(find "$JOURNAL_DIR/entries" -name "????-??-??.md" -type f | sort)
+
+    if [ "${#entry_dates[@]}" -gt 0 ]; then
+        local longest=1 run=1
+        for ((i=1; i<${#entry_dates[@]}; i++)); do
+            local gap=$(( ( $(date_to_epoch "${entry_dates[$i]}") - $(date_to_epoch "${entry_dates[$((i-1))]}") ) / 86400 ))
+            if [ "$gap" -eq 1 ]; then
+                (( run++ ))
+                (( run > longest )) && longest=$run
+            else
+                run=1
+            fi
+        done
+
+        local today_epoch
+        today_epoch=$(date_to_epoch "$(date '+%Y-%m-%d')")
+        local last_epoch
+        last_epoch=$(date_to_epoch "${entry_dates[-1]}")
+        local days_since=$(( (today_epoch - last_epoch) / 86400 ))
+
+        local current=0
+        if [ "$days_since" -le 1 ]; then
+            current=1
+            for ((i=${#entry_dates[@]}-2; i>=0; i--)); do
+                local step=$(( ( $(date_to_epoch "${entry_dates[$((i+1))]}") - $(date_to_epoch "${entry_dates[$i]}") ) / 86400 ))
+                [ "$step" -eq 1 ] && (( current++ )) || break
+            done
+        fi
+
+        echo ""
+        echo "  Current streak: ${current} days"
+        echo "  Longest streak: ${longest} days"
     fi
 }
 
