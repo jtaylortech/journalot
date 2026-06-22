@@ -18,9 +18,11 @@ Type "rm -rf /tmp/jot-demo && mkdir -p /tmp/jot-demo/entries" Enter
 Sleep 200ms
 Type "for i in 15 16 17 18 19 20 21; do echo '# 2026-06-'$i > $JOURNAL_DIR/entries/2026-06-$i.md; echo '' >> $JOURNAL_DIR/entries/2026-06-$i.md; echo 'Good progress today. The kind that compounds.' >> $JOURNAL_DIR/entries/2026-06-$i.md; echo '' >> $JOURNAL_DIR/entries/2026-06-$i.md; echo '#work #coding' >> $JOURNAL_DIR/entries/2026-06-$i.md; done" Enter
 Sleep 500ms
+Type "clear" Enter
+Sleep 300ms
 Show
 
-Sleep 500ms
+Sleep 800ms
 
 # Quick capture — starts the day, creates today's entry
 Type "journal 'Shipped v5.6.0 - day eight'"
