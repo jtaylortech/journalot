@@ -6,7 +6,7 @@
 ![Version](https://img.shields.io/badge/version-5.6.0-blue.svg)
 ![GitHub stars](https://img.shields.io/github/stars/jtaylortech/journalot?style=social)
 
-![journalot demo](docs/demo.gif)
+![journalot demo](https://github.com/jtaylortech/journalot/releases/download/v5.6.2/demo.gif)
 
 **Minimal journaling CLI for developers. Just type `journal` in your terminal and start writing.**
 
