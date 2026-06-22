@@ -334,7 +334,8 @@ show_stats() {
 
     local total_entries=$(find "$JOURNAL_DIR/entries" -name "*.md" -type f | wc -l | tr -d ' ')
     local total_words=$(cat "$JOURNAL_DIR/entries"/*.md 2>/dev/null | wc -w | tr -d ' ')
-    local first_entry=$(find "$JOURNAL_DIR/entries" -name "*.md" -type f | sort | head -1 | xargs basename .md)
+    local first_entry
+    first_entry=$(basename "$(find "$JOURNAL_DIR/entries" -name "*.md" -type f | sort | head -1)" .md)
 
     echo -e "${BLUE}Journal Statistics${NC}\n"
     echo "  Total entries: $total_entries"
@@ -367,7 +368,7 @@ show_stats() {
         local today_epoch
         today_epoch=$(date_to_epoch "$(date '+%Y-%m-%d')")
         local last_epoch
-        last_epoch=$(date_to_epoch "${entry_dates[-1]}")
+        last_epoch=$(date_to_epoch "${entry_dates[${#entry_dates[@]}-1]}")
         local days_since=$(( (today_epoch - last_epoch) / 86400 ))
 
         local current=0
